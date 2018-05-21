@@ -1,9 +1,8 @@
 #pragma once
 
-#include <QtQuick/QQuickItem>
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLFunctions>
-
+#include <QtQuick/qquickwindow.h>
 
 class RendererGL : public QObject, protected QOpenGLFunctions
 {
@@ -24,30 +23,4 @@ private:
     qreal m_t;
     QOpenGLShaderProgram *m_program;
     QQuickWindow *m_window;
-};
-
-class Renderable : public QQuickItem
-{
-    Q_OBJECT
-    Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
-
-public:
-    Renderable();
-
-    qreal t() const { return m_t; }
-    void setT(qreal t);
-
-signals:
-    void tChanged();
-
-public slots:
-    void sync();
-    void cleanup();
-
-private slots:
-    void handleWindowChanged(QQuickWindow *win);
-
-private:
-    qreal m_t;
-    RendererGL *m_renderer;
 };

@@ -1,12 +1,12 @@
 import QtQuick 2.0
-import ModelerRenderable 1.0
+import RenderSurface 1.0
 
 Item {
 
     width: 320
     height: 480
 
-    Renderable {
+    RenderSurface {
         SequentialAnimation on t {
             NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
             NumberAnimation { to: 0; duration: 2500; easing.type: Easing.OutQuad }
@@ -14,7 +14,7 @@ Item {
             running: true
         }
     }
-//! [1] //! [2]
+
     Rectangle {
         color: Qt.rgba(1, 1, 1, 0.7)
         radius: 10

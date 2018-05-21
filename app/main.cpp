@@ -2,13 +2,13 @@
 
 #include <QtQuick/QQuickView>
 
-#include "renderergl.h"
+#include "rendersurface.h"
 
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<Renderable>("ModelerRenderable", 1, 0, "Renderable");
+    qmlRegisterType<RenderSurface>("RenderSurface", 1, 0, "RenderSurface");
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);

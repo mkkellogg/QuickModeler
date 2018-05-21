@@ -4,53 +4,6 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 
-Renderable::Renderable()
-    : m_t(0)
-    , m_renderer(0)
-{
-    connect(this, &QQuickItem::windowChanged, this, &Renderable::handleWindowChanged);
-}
-
-void Renderable::setT(qreal t)
-{
-    if (t == m_t)
-        return;
-    m_t = t;
-    emit tChanged();
-    if (window())
-        window()->update();
-}
-
-void Renderable::handleWindowChanged(QQuickWindow *win)
-{
-    if (win) {
-        connect(win, &QQuickWindow::beforeSynchronizing, this, &Renderable::sync, Qt::DirectConnection);
-        connect(win, &QQuickWindow::sceneGraphInvalidated, this, &Renderable::cleanup, Qt::DirectConnection);
-        // If we allow QML to do the clearing, they would clear what we paint
-        // and nothing would show.
-        win->setClearBeforeRendering(false);
-    }
-}
-
-void Renderable::cleanup()
-{
-    if (m_renderer) {
-        delete m_renderer;
-        m_renderer = 0;
-    }
-}
-
-void Renderable::sync()
-{
-    if (!m_renderer) {
-        m_renderer = new RendererGL();
-        connect(window(), &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
-    }
-    m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
-    m_renderer->setT(m_t);
-    m_renderer->setWindow(window());
-}
-
 RendererGL::~RendererGL()
 {
     delete m_program;
