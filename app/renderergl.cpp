@@ -32,7 +32,7 @@ void RendererGL::paint()
 
     update();
     render();
-    testDraw();
+   // testDraw();
 
 }
 

@@ -44,7 +44,6 @@ void RenderSurface::sync()
         if (this->demo == nullptr) {
             Core::Engine& engine = m_renderer->getEngine();
             this->demo = new Core::Demo(engine);
-
             this->demo->run();
         }
     };
