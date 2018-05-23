@@ -2,7 +2,6 @@
 
 #include <QtQuick/QQuickItem>
 #include "renderergl.h"
-#include "Engine.h"
 
 class RenderSurface : public QQuickItem
 {
@@ -29,6 +28,4 @@ private slots:
 private:
     qreal m_t;
     RendererGL *m_renderer;
-    bool engineInitialized;
-    Core::Engine * engine;
 };

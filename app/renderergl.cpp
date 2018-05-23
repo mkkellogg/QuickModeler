@@ -6,12 +6,42 @@
 
 RendererGL::~RendererGL()
 {
-    delete m_program;
+    if (m_program != nullptr) {
+        delete m_program;
+        m_program = nullptr;
+    }
+
+    if (this->engine != nullptr) {
+        delete this->engine;
+        this->engine = nullptr;
+    }
 }
 
 
 void RendererGL::paint()
 {
+    if (!initialized) {
+        init();
+        initialized = true;
+    }
+
+    update();
+    render();
+    testDraw();
+
+}
+
+Core::Engine& RendererGL::getEngine() {
+    return this->getEngine();
+}
+
+void RendererGL::init() {
+    if (!engineInitialized) {
+      engine = new Core::Engine(Core::Engine::GLVersion::Three);
+      engine->init();
+      engineInitialized = true;
+    }
+
     if (!m_program) {
         initializeOpenGLFunctions();
 
@@ -37,9 +67,18 @@ void RendererGL::paint()
         m_program->link();
 
     }
+}
 
+void RendererGL::update() {
+    engine->update();
+}
+
+void RendererGL::render() {
+    engine->render();
+}
+
+void RendererGL::testDraw() {
     m_program->bind();
-
     m_program->enableAttributeArray(0);
 
     float values[] = {
@@ -70,4 +109,3 @@ void RendererGL::paint()
     // mixing with raw OpenGL.
     m_window->resetOpenGLState();
 }
-
