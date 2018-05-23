@@ -3,6 +3,8 @@
 #include <QtQuick/QQuickItem>
 #include "renderergl.h"
 
+#include "Demo.h"
+
 class RenderSurface : public QQuickItem
 {
     Q_OBJECT
@@ -27,5 +29,6 @@ private slots:
 
 private:
     qreal m_t;
-    RendererGL *m_renderer;
+    RendererGL* m_renderer;
+    Core::Demo* demo;
 };

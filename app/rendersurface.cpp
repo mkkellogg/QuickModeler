@@ -1,7 +1,7 @@
 #include "rendersurface.h"
 #include <QtQuick/qquickwindow.h>
 
-RenderSurface::RenderSurface(): m_t(0), m_renderer(0)
+RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr)
 {
     connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
 }
@@ -39,11 +39,24 @@ void RenderSurface::sync()
         m_renderer = new RendererGL();
         connect(window(), &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
     }
+
+    std::function<void()> initer = [&](){
+        if (demo == nullptr) {
+            Core::Engine& engine = m_renderer->getEngine();
+            demo = new Core::Demo(engine);
+            demo->run();
+        }
+    };
+
+    m_renderer->onInit(initer);
     m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
     m_renderer->setT(m_t);
     m_renderer->setWindow(window());
 }
 
 RenderSurface::~RenderSurface() {
-
+    if (demo != nullptr) {
+        delete demo;
+        demo = nullptr;
+    }
 }

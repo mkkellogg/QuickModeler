@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <functional>
+
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/qquickwindow.h>
@@ -10,8 +13,7 @@ class RendererGL : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    RendererGL() : m_t(0), m_program(nullptr), m_window(nullptr), initialized(false),
-                   engineInitialized(false), engine(nullptr) { }
+    RendererGL();
     ~RendererGL();
 
     void setT(qreal t) { m_t = t; }
@@ -22,6 +24,7 @@ public:
 
 public slots:
     void paint();
+    void onInit(std::function<void()>& func);
 
 private:
     QSize m_viewportSize;
@@ -32,6 +35,8 @@ private:
     bool initialized;
     bool engineInitialized;
     Core::Engine * engine;
+
+    std::vector<std::function<void()>> onInits;
 
     void init();
     void update();

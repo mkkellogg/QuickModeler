@@ -4,6 +4,11 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 
+RendererGL::RendererGL() : m_t(0), m_program(nullptr), m_window(nullptr),
+                           initialized(false), engineInitialized(false), engine(nullptr) {
+
+}
+
 RendererGL::~RendererGL()
 {
     if (m_program != nullptr) {
@@ -32,7 +37,7 @@ void RendererGL::paint()
 }
 
 Core::Engine& RendererGL::getEngine() {
-    return this->getEngine();
+    return *engine;
 }
 
 void RendererGL::init() {
@@ -67,6 +72,15 @@ void RendererGL::init() {
         m_program->link();
 
     }
+
+    for(std::vector<std::function<void()>>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
+        std::function<void()>& func = *itr;
+        func();
+    }
+}
+
+void RendererGL::onInit(std::function<void()>& func) {
+    onInits.push_back(func);
 }
 
 void RendererGL::update() {
