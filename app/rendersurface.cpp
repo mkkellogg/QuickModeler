@@ -40,11 +40,12 @@ void RenderSurface::sync()
         connect(window(), &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
     }
 
-    std::function<void()> initer = [&](){
-        if (demo == nullptr) {
+    std::function<void()> initer = [this]() {
+        if (this->demo == nullptr) {
             Core::Engine& engine = m_renderer->getEngine();
-            demo = new Core::Demo(engine);
-            demo->run();
+            this->demo = new Core::Demo(engine);
+
+            this->demo->run();
         }
     };
 
