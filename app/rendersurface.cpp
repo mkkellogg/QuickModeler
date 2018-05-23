@@ -1,20 +1,17 @@
 #include "rendersurface.h"
-
 #include <QtQuick/qquickwindow.h>
 
-RenderSurface::RenderSurface(): m_t(0), m_renderer(0)
+RenderSurface::RenderSurface(): m_t(0), m_renderer(0), engineInitialized(false), engine(nullptr)
 {
     connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
 }
 
 void RenderSurface::setT(qreal t)
 {
-    if (t == m_t)
-        return;
+    if (t == m_t) return;
     m_t = t;
     emit tChanged();
-    if (window())
-        window()->update();
+    if (window()) window()->update();
 }
 
 void RenderSurface::handleWindowChanged(QQuickWindow *win)
@@ -45,4 +42,17 @@ void RenderSurface::sync()
     m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
     m_renderer->setT(m_t);
     m_renderer->setWindow(window());
+
+    if (!engineInitialized) {
+      engine = new Core::Engine(Core::Engine::GLVersion::Two);
+      engine->init();
+      engineInitialized = true;
+    }
+}
+
+RenderSurface::~RenderSurface() {
+    if (this->engine != nullptr) {
+        delete this->engine;
+        this->engine = nullptr;
+    }
 }
