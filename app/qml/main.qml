@@ -3,8 +3,8 @@ import RenderSurface 1.0
 
 Item {
 
-    width: 320
-    height: 480
+    width: 1200
+    height: 800
 
     RenderSurface {
         SequentialAnimation on t {

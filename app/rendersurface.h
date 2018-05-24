@@ -31,4 +31,5 @@ private:
     qreal m_t;
     RendererGL* m_renderer;
     Core::Demo* demo;
+    QQuickWindow* currentWindow;
 };
