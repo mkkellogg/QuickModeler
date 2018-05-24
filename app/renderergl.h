@@ -16,9 +16,9 @@ public:
     RendererGL();
     ~RendererGL();
 
-    void setT(qreal t) { m_t = t; }
-    void setViewportSize(const QSize &size) { m_viewportSize = size; }
-    void setWindow(QQuickWindow *window) { m_window = window; }
+    void setT(qreal t);
+    void setViewportSize(const QSize &size);
+    void setWindow(QQuickWindow *window);
 
     Core::Engine& getEngine();
 
@@ -34,6 +34,7 @@ private:
 
     bool initialized;
     bool engineInitialized;
+    bool engineWindowSizeSet;
     Core::Engine * engine;
 
     std::vector<std::function<void()>> onInits;

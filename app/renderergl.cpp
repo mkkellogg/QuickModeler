@@ -4,8 +4,8 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 
-RendererGL::RendererGL() : m_t(0), m_program(nullptr), m_window(nullptr),
-                           initialized(false), engineInitialized(false), engine(nullptr) {
+RendererGL::RendererGL() : m_t(0), m_program(nullptr), m_window(nullptr), initialized(false),
+                                   engineInitialized(false), engineWindowSizeSet(false), engine(nullptr) {
 
 }
 
@@ -122,4 +122,22 @@ void RendererGL::testDraw() {
     // Not strictly needed for this example, but generally useful for when
     // mixing with raw OpenGL.
     m_window->resetOpenGLState();
+}
+
+void RendererGL::setT(qreal t) {
+    m_t = t;
+}
+
+void RendererGL::setViewportSize(const QSize &size) {
+    if (m_viewportSize.width() != size.width() || m_viewportSize.height() != size.height() || !engineWindowSizeSet) {
+        if (engine) {
+            engine->resize(size.width(), size.height());
+            engineWindowSizeSet = true;
+        }
+        m_viewportSize = size;
+    }
+}
+
+void RendererGL::setWindow(QQuickWindow *window) {
+    m_window = window;
 }

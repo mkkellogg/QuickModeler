@@ -1,7 +1,7 @@
 #include "rendersurface.h"
 #include <QtQuick/qquickwindow.h>
 
-RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr), currentWindow(nullptr)
+RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr)
 {
     connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
 }
@@ -22,7 +22,6 @@ void RenderSurface::handleWindowChanged(QQuickWindow *win)
         // If we allow QML to do the clearing, they would clear what we paint
         // and nothing would show.
         win->setClearBeforeRendering(false);
-        currentWindow = win;
     }
 }
 
@@ -37,6 +36,8 @@ void RenderSurface::cleanup()
 void RenderSurface::sync()
 {
     static QQuickWindow* oldWindow = nullptr;
+    QQuickWindow* currentWindow = window();
+
     if (!m_renderer) {
         m_renderer = new RendererGL();
 
@@ -55,9 +56,9 @@ void RenderSurface::sync()
         oldWindow = currentWindow;
     }
 
-    m_renderer->setViewportSize(window()->size() * window()->devicePixelRatio());
+    m_renderer->setViewportSize(currentWindow->size() * currentWindow->devicePixelRatio());
     m_renderer->setT(m_t);
-    m_renderer->setWindow(window());
+    m_renderer->setWindow(currentWindow);
 }
 
 RenderSurface::~RenderSurface() {
