@@ -1,21 +1,18 @@
 #include <QtQuick/qquickwindow.h>
 #include "RenderSurface.h"
 
-RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr)
-{
+RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr) {
     connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
 }
 
-void RenderSurface::setT(qreal t)
-{
+void RenderSurface::setT(qreal t) {
     if (t == m_t) return;
     m_t = t;
     emit tChanged();
     if (window()) window()->update();
 }
 
-void RenderSurface::handleWindowChanged(QQuickWindow *win)
-{
+void RenderSurface::handleWindowChanged(QQuickWindow *win) {
     if (win) {
         connect(win, &QQuickWindow::beforeSynchronizing, this, &RenderSurface::sync, Qt::DirectConnection);
         connect(win, &QQuickWindow::sceneGraphInvalidated, this, &RenderSurface::cleanup, Qt::DirectConnection);
@@ -25,16 +22,14 @@ void RenderSurface::handleWindowChanged(QQuickWindow *win)
     }
 }
 
-void RenderSurface::cleanup()
-{
+void RenderSurface::cleanup() {
     if (m_renderer) {
         delete m_renderer;
         m_renderer = 0;
     }
 }
 
-void RenderSurface::sync()
-{
+void RenderSurface::sync() {
     static QQuickWindow* oldWindow = nullptr;
     QQuickWindow* currentWindow = window();
 

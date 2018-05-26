@@ -4,18 +4,12 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLContext>
 
-RendererGL::RendererGL() : m_t(0), m_program(nullptr), m_window(nullptr), initialized(false),
+RendererGL::RendererGL() : m_t(0), m_window(nullptr), initialized(false),
                                    engineInitialized(false), engineWindowSizeSet(false), engine(nullptr) {
 
 }
 
-RendererGL::~RendererGL()
-{
-    if (m_program != nullptr) {
-        delete m_program;
-        m_program = nullptr;
-    }
-
+RendererGL::~RendererGL() {
     if (this->engine != nullptr) {
         delete this->engine;
         this->engine = nullptr;
@@ -23,8 +17,7 @@ RendererGL::~RendererGL()
 }
 
 
-void RendererGL::paint()
-{
+void RendererGL::paint() {
     if (!initialized) {
         init();
         initialized = true;

@@ -4,8 +4,7 @@
 
 #include "RenderSurface.h"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     QGuiApplication app(argc, argv);
 
     qmlRegisterType<RenderSurface>("RenderSurface", 1, 0, "RenderSurface");

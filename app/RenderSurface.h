@@ -6,8 +6,7 @@
 #include "Demo.h"
 #include "Core/Engine.h"
 
-class RenderSurface : public QQuickItem
-{
+class RenderSurface : public QQuickItem {
     Q_OBJECT
     Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
 

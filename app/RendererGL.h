@@ -9,8 +9,7 @@
 
 #include "Core/Engine.h"
 
-class RendererGL : public QObject, protected QOpenGLFunctions
-{
+class RendererGL : public QObject, protected QOpenGLFunctions {
     Q_OBJECT
 public:
     RendererGL();
@@ -29,7 +28,6 @@ public slots:
 private:
     QSize m_viewportSize;
     qreal m_t;
-    QOpenGLShaderProgram *m_program;
     QQuickWindow *m_window;
 
     bool initialized;

@@ -10,6 +10,7 @@
 #include "Core/render/Camera.h"
 #include "Core/material/StandardAttributes.h"
 #include "Core/geometry/Mesh.h"
+#include "Core/render/RenderableContainer.h"
 #include "Core/render/MeshRenderer.h"
 #include "Core/material/BasicCubeMaterial.h"
 #include "Core/material/BasicMaterial.h"
@@ -17,12 +18,12 @@
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
 
-Demo::Demo(Core::Engine& engine): engine(engine){
+Demo::Demo(Core::Engine& engine): engine(engine) {
 
 }
 
 void Demo::run() {
-    engine.onUpdate([this](Core::Engine& engine) {
+    /*engine.onUpdate([this](Core::Engine& engine) {
 
     static Core::Real rotationAngle = 0.0;
     std::shared_ptr<Core::Camera> camera = engine.getCamera();
@@ -49,7 +50,7 @@ void Demo::run() {
         camera->getLocalTransform().getMatrix().copy(worldMatrix);
       }
 
-    });
+    });*/
 
     std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
     engine.setScene(scene);
@@ -84,10 +85,10 @@ void Demo::run() {
     this->skyboxMaterial = std::make_shared<Core::BasicMaterial>();
     this->skyboxMaterial->build();
 
-    std::shared_ptr<Core::Object3D> skyboxObj = std::make_shared<Core::Object3D>();
+    std::shared_ptr<Core::RenderableContainer<Core::Mesh>> skyboxObj = std::make_shared<Core::RenderableContainer<Core::Mesh>>();
     std::shared_ptr<Core::MeshRenderer> skyboxRenderer = std::make_shared<Core::MeshRenderer>(this->skyboxMaterial, skyboxObj);
-    skyboxObj->addRenderable<Core::Mesh>(skyboxMesh);
-    skyboxObj->setCustomRenderer<Core::Mesh>(skyboxRenderer);
+    skyboxObj->addRenderable(skyboxMesh);
+    skyboxObj->setRenderer(skyboxRenderer);
     scene->getRoot()->addObject(skyboxObj);
 
     std::shared_ptr<Core::Camera> camera = std::make_shared<Core::Camera>();
