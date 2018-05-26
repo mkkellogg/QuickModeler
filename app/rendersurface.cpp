@@ -1,5 +1,5 @@
-#include "rendersurface.h"
 #include <QtQuick/qquickwindow.h>
+#include "rendersurface.h"
 
 RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr)
 {
@@ -40,11 +40,10 @@ void RenderSurface::sync()
 
     if (!m_renderer) {
         m_renderer = new RendererGL();
-
         std::function<void()> initer = [this]() {
             if (this->demo == nullptr) {
                 Core::Engine& engine = m_renderer->getEngine();
-                this->demo = new Core::Demo(engine);
+                this->demo = new Demo(engine);
                 this->demo->run();
             }
         };
@@ -62,8 +61,5 @@ void RenderSurface::sync()
 }
 
 RenderSurface::~RenderSurface() {
-    if (demo != nullptr) {
-        delete demo;
-        demo = nullptr;
-    }
+
 }

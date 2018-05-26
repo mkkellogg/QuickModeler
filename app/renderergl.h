@@ -7,7 +7,7 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/qquickwindow.h>
 
-#include "Engine.h"
+#include "Core/Engine.h"
 
 class RendererGL : public QObject, protected QOpenGLFunctions
 {

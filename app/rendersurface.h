@@ -1,9 +1,10 @@
 #pragma once
 
 #include <QtQuick/QQuickItem>
-#include "renderergl.h"
 
-#include "Demo.h"
+#include "renderergl.h"
+#include "demo.h"
+#include "Core/Engine.h"
 
 class RenderSurface : public QQuickItem
 {
@@ -30,5 +31,6 @@ private slots:
 private:
     qreal m_t;
     RendererGL* m_renderer;
-    Core::Demo* demo;
+    Core::Engine* engine;
+    Demo* demo;
 };
