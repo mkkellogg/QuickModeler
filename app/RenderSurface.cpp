@@ -1,5 +1,5 @@
 #include <QtQuick/qquickwindow.h>
-#include "rendersurface.h"
+#include "RenderSurface.h"
 
 RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr)
 {

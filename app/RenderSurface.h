@@ -2,8 +2,8 @@
 
 #include <QtQuick/QQuickItem>
 
-#include "renderergl.h"
-#include "demo.h"
+#include "RendererGL.h"
+#include "Demo.h"
 #include "Core/Engine.h"
 
 class RenderSurface : public QQuickItem

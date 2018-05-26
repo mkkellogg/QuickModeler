@@ -1,4 +1,4 @@
-#include "renderergl.h"
+#include "RendererGL.h"
 
 #include <QtQuick/qquickwindow.h>
 #include <QtGui/QOpenGLShaderProgram>

@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "demo.h"
+#include "Demo.h"
 
 #include "Core/scene/Scene.h"
 #include "Core/common/types.h"

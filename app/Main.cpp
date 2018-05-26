@@ -2,7 +2,7 @@
 
 #include <QtQuick/QQuickView>
 
-#include "rendersurface.h"
+#include "RenderSurface.h"
 
 int main(int argc, char **argv)
 {

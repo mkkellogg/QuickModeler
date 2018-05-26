@@ -4,15 +4,15 @@ CONFIG += c++11
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/renderergl.h \
-    $$PWD/rendersurface.h \
-    $$PWD/demo.h
+    $$PWD/RenderSurface.h \
+    $$PWD/RendererGL.h \
+    $$PWD/Demo.h
 
 SOURCES += \
-    $$PWD/main.cpp \
-    $$PWD/renderergl.cpp \
-    $$PWD/rendersurface.cpp \
-    $$PWD/demo.cpp
+    $$PWD/RenderSurface.cpp \
+    $$PWD/RendererGL.cpp \
+    $$PWD/Main.cpp \
+    $$PWD/Demo.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc
