@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Engine.h"
+#include "Core/render/Camera.h"
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
 #include "Core/material/BasicMaterial.h"
@@ -18,5 +19,5 @@ private:
     std::shared_ptr<Core::BasicMaterial> skyboxMaterial;
     std::shared_ptr<Core::ImageLoader> imageLoader;
     std::shared_ptr<Core::AssetLoader> assetLoader;
-
+    std::shared_ptr<Core::Camera> camera;
 };

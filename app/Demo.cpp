@@ -23,10 +23,8 @@ Demo::Demo(Core::Engine& engine): engine(engine) {
 }
 
 void Demo::run() {
-    /*engine.onUpdate([this](Core::Engine& engine) {
-
+    engine.onUpdate([this](Core::Engine& engine) {
     static Core::Real rotationAngle = 0.0;
-    std::shared_ptr<Core::Camera> camera = engine.getCamera();
     if (camera) {
         rotationAngle += 0.01;
         if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
@@ -36,21 +34,16 @@ void Demo::run() {
         Core::Matrix4x4 rotationMatrixA;
         qA.rotationMatrix(rotationMatrixA);
 
-        Core::Quaternion qB;
-        qB.fromAngleAxis(-0.8, 1, 0, 0);
-        Core::Matrix4x4 rotationMatrixB;
-        qB.rotationMatrix(rotationMatrixB);
-
         Core::Matrix4x4 worldMatrix;
         worldMatrix.multiply(rotationMatrixA);
-
-        worldMatrix.translate(0, 12, 15);
-        worldMatrix.multiply(rotationMatrixB);
-
-        camera->getLocalTransform().getMatrix().copy(worldMatrix);
+        worldMatrix.translate(12, 0, 0);
+        worldMatrix.translate(0, 7, 0);
+        camera->getTransform().getLocalMatrix().copy(worldMatrix);
+        camera->getTransform().updateWorldMatrix();
+        camera->lookAt(Core::Point3r(0, 0, 0));
       }
 
-    });*/
+    });
 
     std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
     engine.setScene(scene);
@@ -91,6 +84,7 @@ void Demo::run() {
     skyboxObj->setRenderer(skyboxRenderer);
     scene->getRoot()->addObject(skyboxObj);
 
-    std::shared_ptr<Core::Camera> camera = std::make_shared<Core::Camera>();
-    engine.setCamera(camera);
+    camera = std::make_shared<Core::Camera>();
+    scene->getRoot()->addObject(camera);
+
 }
