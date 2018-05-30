@@ -81,6 +81,13 @@ void RendererGL::setRenderSize(unsigned int width, unsigned int height, unsigned
 
 }
 
+void RendererGL::setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight) {
+    if (engine) {
+        engine->setViewport(hOffset, vOffset, vpWidth, vpHeight);
+        engineWindowSizeSet = true;
+    }
+}
+
 void RendererGL::setWindow(QQuickWindow *window) {
     m_window = window;
 }

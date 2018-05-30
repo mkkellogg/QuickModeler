@@ -50,13 +50,11 @@ void RenderSurface::sync() {
         oldWindow = currentWindow;
     }
 
-    //m_renderer->setViewportSize(currentWindow->size() * currentWindow->devicePixelRatio());
-
     if(m_renderer->isEngineInitialized()) {
-        QSize size = currentWindow->size() * currentWindow->devicePixelRatio();
-        m_renderer->setRenderSize(size.width(), size.height());
-        Core::Engine& engine = m_renderer->getEngine();
-        engine.setViewport(300, 250, 200, 200);
+        QSize windowSize = currentWindow->size() * currentWindow->devicePixelRatio();
+        Core::Vector2u engineWidowSize(this->boundingRect().width(), this->boundingRect().height());
+        Core::Vector2u engineWindowOffset(this->x(), this->y());
+        m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
     }
 
     m_renderer->setT(m_t);

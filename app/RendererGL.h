@@ -20,6 +20,7 @@ public:
     void setRenderSize(unsigned int width, unsigned int height, bool updateViewport = true);
     void setRenderSize(unsigned int width, unsigned int height, unsigned int hOffset,
                        unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
+    void setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
     void setWindow(QQuickWindow *window);
 
     Core::Engine& getEngine();
