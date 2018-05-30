@@ -87,4 +87,5 @@ void Demo::run() {
     camera = std::make_shared<Core::Camera>();
     scene->getRoot()->addObject(camera);
 
+
 }

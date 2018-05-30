@@ -8,6 +8,7 @@
 #include <QtQuick/qquickwindow.h>
 
 #include "Core/Engine.h"
+#include "Core/geometry/Vector2.h"
 
 class RendererGL : public QObject, protected QOpenGLFunctions {
     Q_OBJECT
@@ -16,7 +17,9 @@ public:
     ~RendererGL();
 
     void setT(qreal t);
-    void setViewportSize(const QSize &size);
+    void setRenderSize(unsigned int width, unsigned int height, bool updateViewport = true);
+    void setRenderSize(unsigned int width, unsigned int height, unsigned int hOffset,
+                       unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
     void setWindow(QQuickWindow *window);
 
     Core::Engine& getEngine();
@@ -24,9 +27,9 @@ public:
 public slots:
     void paint();
     void onInit(std::function<void()>& func);
+    bool isEngineInitialized();
 
 private:
-    QSize m_viewportSize;
     qreal m_t;
     QQuickWindow *m_window;
 

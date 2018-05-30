@@ -49,6 +49,10 @@ void RendererGL::onInit(std::function<void()>& func) {
     onInits.push_back(func);
 }
 
+bool RendererGL::isEngineInitialized() {
+    return this->engineInitialized;
+}
+
 void RendererGL::update() {
     engine->update();
 }
@@ -61,14 +65,20 @@ void RendererGL::setT(qreal t) {
     m_t = t;
 }
 
-void RendererGL::setViewportSize(const QSize &size) {
-    if (m_viewportSize.width() != size.width() || m_viewportSize.height() != size.height() || !engineWindowSizeSet) {
-        if (engine) {
-            engine->resize(size.width(), size.height());
-            engineWindowSizeSet = true;
-        }
-        m_viewportSize = size;
+void RendererGL::setRenderSize(unsigned int width, unsigned int height, bool updateViewport) {
+    if (engine) {
+        engine->setRenderSize(width, height, updateViewport);
+        engineWindowSizeSet = true;
     }
+}
+
+void RendererGL::setRenderSize(unsigned int width, unsigned int height, unsigned int hOffset,
+                               unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight) {
+    if (engine) {
+        engine->setRenderSize(width, height, hOffset, vOffset, vpWidth, vpHeight);
+        engineWindowSizeSet = true;
+    }
+
 }
 
 void RendererGL::setWindow(QQuickWindow *window) {

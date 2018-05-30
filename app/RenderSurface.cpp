@@ -50,7 +50,15 @@ void RenderSurface::sync() {
         oldWindow = currentWindow;
     }
 
-    m_renderer->setViewportSize(currentWindow->size() * currentWindow->devicePixelRatio());
+    //m_renderer->setViewportSize(currentWindow->size() * currentWindow->devicePixelRatio());
+
+    if(m_renderer->isEngineInitialized()) {
+        QSize size = currentWindow->size() * currentWindow->devicePixelRatio();
+        m_renderer->setRenderSize(size.width(), size.height());
+        Core::Engine& engine = m_renderer->getEngine();
+        engine.setViewport(300, 250, 200, 200);
+    }
+
     m_renderer->setT(m_t);
     m_renderer->setWindow(currentWindow);
 }

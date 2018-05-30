@@ -30,6 +30,5 @@ private slots:
 private:
     qreal m_t;
     RendererGL* m_renderer;
-    Core::Engine* engine;
     Demo* demo;
 };
