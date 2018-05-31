@@ -3,6 +3,7 @@
 #include <QtQuick/QQuickItem>
 
 #include "RendererGL.h"
+#include "MouseHandler.h"
 #include "Demo.h"
 #include "Core/Engine.h"
 
@@ -16,6 +17,9 @@ public:
 
     qreal t() const { return m_t; }
     void setT(qreal t);
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
 
 signals:
     void tChanged();
@@ -31,4 +35,5 @@ private:
     qreal m_t;
     RendererGL* m_renderer;
     Demo* demo;
+    MouseHandler mouseHandler;
 };

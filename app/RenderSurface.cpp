@@ -12,6 +12,15 @@ void RenderSurface::setT(qreal t) {
     if (window()) window()->update();
 }
 
+bool RenderSurface::eventFilter(QObject* obj, QEvent* event) {
+
+    bool customHandling = mouseHandler.handleEvent(obj, event);
+    if (customHandling) return true;
+
+    // standard event processing
+    return QObject::eventFilter(obj, event);
+}
+
 void RenderSurface::handleWindowChanged(QQuickWindow *win) {
     if (win) {
         connect(win, &QQuickWindow::beforeSynchronizing, this, &RenderSurface::sync, Qt::DirectConnection);
@@ -43,6 +52,9 @@ void RenderSurface::sync() {
             }
         };
         m_renderer->onInit(initer);
+
+        QQuickItem* mouseArea = this->childItems()[0];
+        mouseArea->installEventFilter(this);
     }
 
     if (oldWindow != currentWindow) {
@@ -54,7 +66,7 @@ void RenderSurface::sync() {
         QSize windowSize = currentWindow->size() * currentWindow->devicePixelRatio();
         Core::Vector2u engineWidowSize(this->boundingRect().width(), this->boundingRect().height());
         Core::Vector2u engineWindowOffset(this->x(), this->y());
-        m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
+        m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);       
     }
 
     m_renderer->setT(m_t);

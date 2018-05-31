@@ -8,7 +8,7 @@ Item {
 
 
     Rectangle {
-        id: "topMenu"
+        id: topMenu
         color: Qt.rgba(1, 1, 1, 0.7)
         radius: 0
         border.width: 1
@@ -20,7 +20,7 @@ Item {
     }
 
     Rectangle {
-        id: "leftMenu"
+        id: leftMenu
         color: Qt.rgba(1, 1, 1, 0.7)
         radius: 0
         border.width: 1
@@ -31,7 +31,6 @@ Item {
         width:250
     }
 
-
     RenderSurface {
         SequentialAnimation on t {
             NumberAnimation { to: 1; duration: 2500; easing.type: Easing.InQuad }
@@ -39,10 +38,26 @@ Item {
             loops: Animation.Infinite
             running: true
         }
+
         anchors.left: leftMenu.right
         anchors.top: topMenu.bottom
         width: parent.width - leftMenu.width
         height: parent.height - topMenu.height
+
+        MouseArea {
+            anchors.fill: parent
+           // onClicked: { console.log("Bar"); }
+        }
+        /*MouseArea {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 100
+            onClicked: {
+                console.log("Foo");
+                mouse.accepted = true
+            }
+        }*/
     }
 
 
