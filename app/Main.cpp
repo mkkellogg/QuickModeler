@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<RenderSurface>("RenderSurface", 1, 0, "RenderSurface");
+    qmlRegisterType<Modeler::RenderSurface>("RenderSurface", 1, 0, "RenderSurface");
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);

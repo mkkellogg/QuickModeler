@@ -6,21 +6,25 @@
 
 #include "Core/geometry/Vector2.h"
 
-class MouseHandler
-{
-    class MouseButtonStatus {
+namespace Modeler {
+
+    class MouseHandler
+    {
+        class MouseButtonStatus {
+        public:
+            bool pressed;
+            Core::Vector2u pressedLocation;
+        };
+
+        static const unsigned int MAX_BUTTONS = 16;
+        MouseButtonStatus buttonStatuses[MAX_BUTTONS];
+        static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
+
     public:
-        bool pressed;
-        Core::Vector2u pressedLocation;
+        MouseHandler();
+
+        bool handleEvent(QObject* obj, QEvent* event);
+
     };
 
-    static const unsigned int MAX_BUTTONS = 16;
-    MouseButtonStatus buttonStatuses[MAX_BUTTONS];
-    static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
-
-public:
-    MouseHandler();
-
-    bool handleEvent(QObject* obj, QEvent* event);
-
-};
+}

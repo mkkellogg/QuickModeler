@@ -7,33 +7,35 @@
 #include "Demo.h"
 #include "Core/Engine.h"
 
-class RenderSurface : public QQuickItem {
-    Q_OBJECT
-    Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
+namespace Modeler  {
+    class RenderSurface : public QQuickItem {
+        Q_OBJECT
+        Q_PROPERTY(qreal t READ t WRITE setT NOTIFY tChanged)
 
-public:
-    RenderSurface();
-    ~RenderSurface();
+    public:
+        RenderSurface();
+        ~RenderSurface();
 
-    qreal t() const { return m_t; }
-    void setT(qreal t);
+        qreal t() const { return m_t; }
+        void setT(qreal t);
 
-protected:
-    bool eventFilter(QObject* obj, QEvent* event);
+    protected:
+        bool eventFilter(QObject* obj, QEvent* event);
 
-signals:
-    void tChanged();
+    signals:
+        void tChanged();
 
-public slots:
-    void sync();
-    void cleanup();
+    public slots:
+        void sync();
+        void cleanup();
 
-private slots:
-    void handleWindowChanged(QQuickWindow *win);
+    private slots:
+        void handleWindowChanged(QQuickWindow *win);
 
-private:
-    qreal m_t;
-    RendererGL* m_renderer;
-    Demo* demo;
-    MouseHandler mouseHandler;
-};
+    private:
+        qreal m_t;
+        RendererGL* m_renderer;
+        Demo* demo;
+        MouseHandler mouseHandler;
+    };
+}

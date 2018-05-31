@@ -10,39 +10,41 @@
 #include "Core/Engine.h"
 #include "Core/geometry/Vector2.h"
 
-class RendererGL : public QObject, protected QOpenGLFunctions {
-    Q_OBJECT
-public:
-    RendererGL();
-    ~RendererGL();
+namespace Modeler {
+    class RendererGL : public QObject, protected QOpenGLFunctions {
+        Q_OBJECT
+    public:
+        RendererGL();
+        ~RendererGL();
 
-    void setT(qreal t);
-    void setRenderSize(unsigned int width, unsigned int height, bool updateViewport = true);
-    void setRenderSize(unsigned int width, unsigned int height, unsigned int hOffset,
-                       unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
-    void setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
-    void setWindow(QQuickWindow *window);
+        void setT(qreal t);
+        void setRenderSize(unsigned int width, unsigned int height, bool updateViewport = true);
+        void setRenderSize(unsigned int width, unsigned int height, unsigned int hOffset,
+                           unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
+        void setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
+        void setWindow(QQuickWindow *window);
 
-    Core::Engine& getEngine();
+        Core::Engine& getEngine();
 
-public slots:
-    void paint();
-    void onInit(std::function<void()>& func);
-    bool isEngineInitialized();
+    public slots:
+        void paint();
+        void onInit(std::function<void()>& func);
+        bool isEngineInitialized();
 
-private:
-    qreal m_t;
-    QQuickWindow *m_window;
+    private:
+        qreal m_t;
+        QQuickWindow *m_window;
 
-    bool initialized;
-    bool engineInitialized;
-    bool engineWindowSizeSet;
-    Core::Engine * engine;
+        bool initialized;
+        bool engineInitialized;
+        bool engineWindowSizeSet;
+        Core::Engine * engine;
 
-    std::vector<std::function<void()>> onInits;
+        std::vector<std::function<void()>> onInits;
 
-    void init();
-    void update();
-    void render();
-    void testDraw();
-};
+        void init();
+        void update();
+        void render();
+        void testDraw();
+    };
+}
