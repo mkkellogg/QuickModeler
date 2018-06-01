@@ -23,7 +23,7 @@ namespace Modeler {
     }
 
     bool RenderSurface::initialize(ModelerApp* modelerApp) {
-        this->modelerApp = modelerApp;
+        if(!ModelerAppWindow::initialize(modelerApp)) return false;
         this->initialized = true;
         return true;
     }
