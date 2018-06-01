@@ -2,7 +2,7 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    RenderSurface::RenderSurface(): m_t(0), m_renderer(nullptr), demo(nullptr) {
+    RenderSurface::RenderSurface(): initialized(false), m_t(0), m_renderer(nullptr), demo(nullptr) {
         connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
     }
 
@@ -20,6 +20,12 @@ namespace Modeler {
 
         // standard event processing
         return QObject::eventFilter(obj, event);
+    }
+
+    bool RenderSurface::initialize(ModelerApp* modelerApp) {
+        this->modelerApp = modelerApp;
+        this->initialized = true;
+        return true;
     }
 
     void RenderSurface::handleWindowChanged(QQuickWindow *win) {
@@ -41,37 +47,40 @@ namespace Modeler {
 
     void RenderSurface::sync() {
         static QQuickWindow* oldWindow = nullptr;
-        QQuickWindow* currentWindow = window();
 
-        if (!m_renderer) {
-            m_renderer = new RendererGL();
-            std::function<void()> initer = [this]() {
-                if (this->demo == nullptr) {
-                    Core::Engine& engine = m_renderer->getEngine();
-                    this->demo = new Demo(engine);
-                    this->demo->run();
-                }
-            };
-            m_renderer->onInit(initer);
+        if (initialized) {
+            QQuickWindow* currentWindow = window();
 
-            QQuickItem* mouseArea = this->childItems()[0];
-            mouseArea->installEventFilter(this);
+            if (!m_renderer) {
+                m_renderer = new RendererGL();
+                std::function<void()> initer = [this]() {
+                    if (this->demo == nullptr) {
+                        Core::Engine& engine = m_renderer->getEngine();
+                        this->demo = new Demo(engine);
+                        this->demo->run();
+                    }
+                };
+                m_renderer->onInit(initer);
+
+                QQuickItem* mouseArea = this->childItems()[0];
+                mouseArea->installEventFilter(this);
+            }
+
+            if(m_renderer->isEngineInitialized()) {
+                QSize windowSize = currentWindow->size() * currentWindow->devicePixelRatio();
+                Core::Vector2u engineWidowSize(this->boundingRect().width(), this->boundingRect().height());
+                Core::Vector2u engineWindowOffset(this->x(), this->y());
+                m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
+            }
+
+            if (oldWindow != currentWindow) {
+                connect(currentWindow, &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
+                oldWindow = currentWindow;
+            }
+
+            m_renderer->setT(m_t);
+            m_renderer->setWindow(currentWindow);
         }
-
-        if (oldWindow != currentWindow) {
-            connect(currentWindow, &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
-            oldWindow = currentWindow;
-        }
-
-        if(m_renderer->isEngineInitialized()) {
-            QSize windowSize = currentWindow->size() * currentWindow->devicePixelRatio();
-            Core::Vector2u engineWidowSize(this->boundingRect().width(), this->boundingRect().height());
-            Core::Vector2u engineWindowOffset(this->x(), this->y());
-            m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
-        }
-
-        m_renderer->setT(m_t);
-        m_renderer->setWindow(currentWindow);
     }
 
     RenderSurface::~RenderSurface() {
