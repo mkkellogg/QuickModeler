@@ -21,12 +21,12 @@ namespace Modeler {
         QObject *object = this->rootView->rootObject();
         QObject *rsObj = object->findChild<QObject*>(windowName.c_str());
         if (rsObj) {
-            Modeler::RenderSurface* renderSurface = dynamic_cast<Modeler::RenderSurface*>(rsObj);
-            if(renderSurface) {
-                renderSurface->initialize(this);
+            Modeler::ModelerAppWindow* appWindow = dynamic_cast<Modeler::ModelerAppWindow*>(rsObj);
+            if(appWindow) {
+                appWindow->initialize(this);
             }
             else {
-                qDebug() << "Unable to locate instance of RenderSurface!";
+                qDebug() << "Unable to locate instance of app window!";
                 return false;
             }
         }
