@@ -8,7 +8,7 @@
 
 namespace Modeler {
 
-    class MouseHandler
+    class MouseAdapter
     {
         class MouseButtonStatus {
         public:
@@ -21,9 +21,9 @@ namespace Modeler {
         static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
 
     public:
-        MouseHandler();
+        MouseAdapter();
 
-        bool handleEvent(QObject* obj, QEvent* event);
+        bool processEvent(QObject* obj, QEvent* event);
 
     };
 

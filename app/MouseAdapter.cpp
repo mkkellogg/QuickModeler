@@ -1,13 +1,13 @@
-#include "MouseHandler.h"
+#include "MouseAdapter.h"
 
 namespace Modeler {
 
-    MouseHandler::MouseHandler() {
+    MouseAdapter::MouseAdapter() {
 
 
     }
 
-    bool MouseHandler::handleEvent(QObject* obj, QEvent* event) {
+    bool MouseAdapter::processEvent(QObject* obj, QEvent* event) {
 
         auto eventType = event->type();
         if (eventType == QEvent::MouseButtonPress ||
@@ -36,7 +36,7 @@ namespace Modeler {
          return false;
     }
 
-    unsigned int MouseHandler::getMouseButtonIndex(const Qt::MouseButton& button) {
+    unsigned int MouseAdapter::getMouseButtonIndex(const Qt::MouseButton& button) {
         if(button == Qt::LeftButton){
             return 1;
         }

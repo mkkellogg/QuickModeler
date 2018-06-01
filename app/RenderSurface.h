@@ -6,7 +6,7 @@
 #include "ModelerApp.h"
 #include "ModelerAppWindow.h"
 #include "RendererGL.h"
-#include "MouseHandler.h"
+#include "MouseAdapter.h"
 #include "Demo.h"
 #include "Core/Engine.h"
 
@@ -42,6 +42,6 @@ namespace Modeler  {
         qreal m_t;
         RendererGL* m_renderer;
         Demo* demo;
-        MouseHandler mouseHandler;
+        MouseAdapter mouseAdapter;
     };
 }

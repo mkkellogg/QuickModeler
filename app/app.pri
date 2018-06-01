@@ -7,18 +7,18 @@ HEADERS += \
     $$PWD/RenderSurface.h \
     $$PWD/RendererGL.h \
     $$PWD/Demo.h \
-    $$PWD/MouseHandler.h \
     $$PWD/ModelerApp.h \
-    $$PWD/ModelerAppWindow.h
+    $$PWD/ModelerAppWindow.h \
+    $$PWD/MouseAdapter.h
 
 SOURCES += \
     $$PWD/RenderSurface.cpp \
     $$PWD/RendererGL.cpp \
     $$PWD/Main.cpp \
     $$PWD/Demo.cpp \
-    $$PWD/MouseHandler.cpp \
     $$PWD/ModelerApp.cpp \
-    $$PWD/ModelerAppWindow.cpp
+    $$PWD/ModelerAppWindow.cpp \
+    $$PWD/MouseAdapter.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc

@@ -15,7 +15,7 @@ namespace Modeler {
 
     bool RenderSurface::eventFilter(QObject* obj, QEvent* event) {
 
-        bool customHandling = mouseHandler.handleEvent(obj, event);
+        bool customHandling = mouseAdapter.processEvent(obj, event);
         if (customHandling) return true;
 
         // standard event processing
