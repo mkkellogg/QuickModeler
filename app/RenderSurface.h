@@ -23,6 +23,8 @@ namespace Modeler  {
 
         qreal t() const { return m_t; }
         void setT(qreal t);
+        RendererGL * getRenderer();
+
         virtual bool initialize(ModelerApp* modelerApp) override;
         virtual GestureAdapter* getGestureAdapter() override;
 
@@ -42,8 +44,7 @@ namespace Modeler  {
     private:
         bool initialized;
         qreal m_t;
-        RendererGL* m_renderer;
-        Demo* demo;
+        RendererGL renderer;
 
         MouseAdapter mouseAdapter;
         GestureAdapter gestureAdapter;

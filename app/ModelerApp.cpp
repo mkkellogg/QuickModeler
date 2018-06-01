@@ -26,6 +26,18 @@ namespace Modeler {
             if (gestureAdapter) {
                 gestureAdapter->setPipedEventAdapter(&pipedGestureAdapter);
             }
+
+            RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
+            if (renderSurface) {
+                RendererGL * renderer = renderSurface->getRenderer();
+                std::function<void()> initer = [renderer]() {
+                    Core::Engine& engine = renderer->getEngine();
+                    Demo* demo = new Demo(engine);
+                    demo->run();
+                };
+                renderer->onInit(initer);
+            }
+
         }
 
         return true;

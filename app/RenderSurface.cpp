@@ -2,7 +2,7 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    RenderSurface::RenderSurface(): initialized(false), m_t(0), m_renderer(nullptr), demo(nullptr) {
+    RenderSurface::RenderSurface(): initialized(false), m_t(0){
         connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
     }
 
@@ -11,6 +11,10 @@ namespace Modeler {
         m_t = t;
         emit tChanged();
         if (window()) window()->update();
+    }
+
+    RendererGL * RenderSurface::getRenderer() {
+        return &renderer;
     }
 
     bool RenderSurface::eventFilter(QObject* obj, QEvent* event) {
@@ -43,10 +47,7 @@ namespace Modeler {
     }
 
     void RenderSurface::cleanup() {
-        if (m_renderer) {
-            delete m_renderer;
-            m_renderer = 0;
-        }
+
     }
 
     void RenderSurface::sync() {
@@ -55,36 +56,24 @@ namespace Modeler {
         if (initialized) {
             QQuickWindow* currentWindow = window();
 
-            if (!m_renderer) {
-                m_renderer = new RendererGL();
-                std::function<void()> initer = [this]() {
-                    if (this->demo == nullptr) {
-                        Core::Engine& engine = m_renderer->getEngine();
-                        this->demo = new Demo(engine);
-                        this->demo->run();
-                    }
-                };
-                m_renderer->onInit(initer);
-
+            if(renderer.isEngineInitialized()) {
                 QQuickItem* mouseArea = this->childItems()[0];
                 mouseArea->installEventFilter(this);
                 gestureAdapter.setMouseAdapter(mouseAdapter);
-            }
 
-            if(m_renderer->isEngineInitialized()) {
                 QSize windowSize = currentWindow->size() * currentWindow->devicePixelRatio();
                 Core::Vector2u engineWidowSize(this->boundingRect().width(), this->boundingRect().height());
                 Core::Vector2u engineWindowOffset(this->x(), this->y());
-                m_renderer->setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
+                renderer.setRenderSize(engineWidowSize.x, engineWidowSize.y, engineWindowOffset.x, windowSize.height() - engineWidowSize.y - engineWindowOffset.y, engineWidowSize.x, engineWidowSize.y);
             }
 
             if (oldWindow != currentWindow) {
-                connect(currentWindow, &QQuickWindow::beforeRendering, m_renderer, &RendererGL::paint, Qt::DirectConnection);
+                connect(currentWindow, &QQuickWindow::beforeRendering, &renderer, &RendererGL::paint, Qt::DirectConnection);
                 oldWindow = currentWindow;
             }
 
-            m_renderer->setT(m_t);
-            m_renderer->setWindow(currentWindow);
+            renderer.setT(m_t);
+            renderer.setWindow(currentWindow);
         }
     }
 
