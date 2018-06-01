@@ -28,6 +28,10 @@ namespace Modeler {
         return true;
     }
 
+    GestureAdapter* RenderSurface::getGestureAdapter() {
+        return &gestureAdapter;
+    }
+
     void RenderSurface::handleWindowChanged(QQuickWindow *win) {
         if (win) {
             connect(win, &QQuickWindow::beforeSynchronizing, this, &RenderSurface::sync, Qt::DirectConnection);
@@ -64,6 +68,7 @@ namespace Modeler {
 
                 QQuickItem* mouseArea = this->childItems()[0];
                 mouseArea->installEventFilter(this);
+                gestureAdapter.setMouseAdapter(mouseAdapter);
             }
 
             if(m_renderer->isEngineInitialized()) {

@@ -24,7 +24,7 @@ namespace Modeler {
         public:
             MouseEvent(MouseEventType type): type(type) {}
             MouseEventType getType() {return  type;}
-            unsigned int button;
+            unsigned int buttons;
             Core::Vector2u position;
         private:
             MouseEventType type;
@@ -45,6 +45,7 @@ namespace Modeler {
 
         static const unsigned int MAX_BUTTONS = 16;
         MouseButtonStatus buttonStatuses[MAX_BUTTONS];
+        unsigned int pressedButtonMask = 0;
         static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
 
         const PipedEventAdapter<MouseEvent>* pipedEventAdapter;

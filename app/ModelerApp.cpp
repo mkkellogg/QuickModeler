@@ -5,7 +5,7 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView) {
+    ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView), pipedGestureAdapter(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1)) {
         for (unsigned int i = 0; i < MaxWindows; i++) this->liveWindows[i] = nullptr;
     }
 
@@ -20,6 +20,14 @@ namespace Modeler {
             return false;
         }
         this->liveWindows[(unsigned int)type] = window;
+
+        if (type == AppWindowType::RenderSurface) {
+            GestureAdapter* gestureAdapter = window->getGestureAdapter();
+            if (gestureAdapter) {
+                gestureAdapter->setPipedEventAdapter(&pipedGestureAdapter);
+            }
+        }
+
         return true;
     }
 
@@ -37,5 +45,14 @@ namespace Modeler {
             }
         }
         return true;
+    }
+
+    void ModelerApp::onGesture(GestureAdapter::GestureEvent event) {
+        GestureAdapter::GestureEventType eventType = event.getType();
+        switch(eventType) {
+            case GestureAdapter::GestureEventType::Drag:
+                // printf("App Drag: [%u, %u] -> [%u, %u]\n", event.start.x, event.start.y, event.end.x, event.end.y);
+            break;
+        }
     }
 }

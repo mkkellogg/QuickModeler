@@ -7,6 +7,8 @@
 #include <QtQuick/QQuickView>
 
 #include "ModelerAppWindow.h"
+#include "GestureAdapter.h"
+#include "PipedEventAdapter.h"
 
 namespace Modeler {
 
@@ -25,8 +27,12 @@ namespace Modeler {
         bool addLoadedWindow(const std::string& windowName, AppWindowType type);
 
     private:
+
+        void onGesture(GestureAdapter::GestureEvent event);
+
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
+        PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
     };
 }
 

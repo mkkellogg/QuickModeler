@@ -25,26 +25,32 @@ namespace Modeler {
 
             const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>( event );
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
+
             QPoint qMousePos = mouseEvent->pos();
             Core::Vector2u mousePos(qMousePos.x(), qMousePos.y());
+            MouseEventType mouseEventType;
             switch(eventType) {
                 case QEvent::MouseButtonPress:
                     buttonStatuses[buttonIndex].pressed = true;
-                    buttonStatuses[buttonIndex].pressedLocation.copy(mousePos);
-                    if (this->pipedEventAdapter) {
-                        MouseEvent event(MouseEventType::ButtonDown);
-                        event.button = buttonIndex;
-                        event.position.copy(mousePos);
-                        this->pipedEventAdapter->accept(event);
-                    }
+                    buttonStatuses[buttonIndex].pressedLocation = mousePos;
+                    pressedButtonMask |= 1 << (buttonIndex - 1);
+                    mouseEventType = MouseEventType::ButtonDown;
                     break;
                 case QEvent::MouseButtonRelease:
                     buttonStatuses[buttonIndex].pressed = false;
+                    pressedButtonMask &= ~(1 << (buttonIndex - 1));
+                    mouseEventType = MouseEventType::ButtonUp;
                     break;
                 case QEvent::MouseMove:
-
+                    mouseEventType = MouseEventType::MouseMoved;
                     break;
                 default: break;
+            }
+            if (this->pipedEventAdapter) {
+                MouseEvent event(mouseEventType);
+                event.buttons = pressedButtonMask;
+                event.position = mousePos;
+                this->pipedEventAdapter->accept(event);
             }
             return true;
         }
@@ -53,21 +59,11 @@ namespace Modeler {
     }
 
     unsigned int MouseAdapter::getMouseButtonIndex(const Qt::MouseButton& button) {
-        if(button == Qt::LeftButton){
-            return 1;
-        }
-        else if(button == Qt::RightButton){
-            return 2;
-        }
-        else if((button == Qt::MiddleButton) || (button == Qt::MidButton)) {
-            return 3;
-        }
-        else if(button == Qt::XButton1){
-            return 4;
-        }
-        else if(button == Qt::XButton2){
-            return 5;
-        }
+        if(button == Qt::LeftButton) {return 1;}
+        else if(button == Qt::RightButton) {return 2;}
+        else if((button == Qt::MiddleButton) || (button == Qt::MidButton)) {return 3;}
+        else if(button == Qt::XButton1){return 4;}
+        else if(button == Qt::XButton2){return 5;}
         else return 0;
     }
 

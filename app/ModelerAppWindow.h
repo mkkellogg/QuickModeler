@@ -2,6 +2,8 @@
 
 #include <QtQuick/QQuickItem>
 
+#include "GestureAdapter.h"
+
 namespace Modeler {
 
     // forward declaration
@@ -13,7 +15,7 @@ namespace Modeler {
         ModelerAppWindow();
         virtual ~ModelerAppWindow() = 0;
         virtual bool initialize(ModelerApp* modelerApp);
-
+        virtual GestureAdapter* getGestureAdapter() = 0;
     protected:
         ModelerApp* modelerApp;
 

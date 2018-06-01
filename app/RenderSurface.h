@@ -7,6 +7,7 @@
 #include "ModelerAppWindow.h"
 #include "RendererGL.h"
 #include "MouseAdapter.h"
+#include "GestureAdapter.h"
 #include "Demo.h"
 #include "Core/Engine.h"
 
@@ -23,6 +24,7 @@ namespace Modeler  {
         qreal t() const { return m_t; }
         void setT(qreal t);
         virtual bool initialize(ModelerApp* modelerApp) override;
+        virtual GestureAdapter* getGestureAdapter() override;
 
     protected:
         bool eventFilter(QObject* obj, QEvent* event);
@@ -42,6 +44,8 @@ namespace Modeler  {
         qreal m_t;
         RendererGL* m_renderer;
         Demo* demo;
+
         MouseAdapter mouseAdapter;
+        GestureAdapter gestureAdapter;
     };
 }
