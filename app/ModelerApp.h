@@ -10,6 +10,8 @@
 #include "GestureAdapter.h"
 #include "PipedEventAdapter.h"
 
+#include "Core/Engine.h"
+
 namespace Modeler {
 
     class ModelerApp {
@@ -29,10 +31,13 @@ namespace Modeler {
     private:
 
         void onGesture(GestureAdapter::GestureEvent event);
+        void onEngineReady(Core::Engine& engine);
 
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
         PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
+
+        std::shared_ptr<Core::Camera> renderCamera;
     };
 }
 
