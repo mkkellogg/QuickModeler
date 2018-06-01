@@ -13,7 +13,8 @@ HEADERS += \
     $$PWD/GestureAdapter.h \
     $$PWD/EventQueue.h \
     $$PWD/Event.h \
-    $$PWD/Types.h
+    $$PWD/Types.h \
+    $$PWD/PipedEventAdapter.h
 
 SOURCES += \
     $$PWD/RenderSurface.cpp \

@@ -2,8 +2,18 @@
 
 namespace Modeler {
 
-    MouseAdapter::MouseAdapter() {
+    MouseAdapter::MouseAdapter(): pipedEventAdapter(nullptr) {
 
+    }
+
+    bool MouseAdapter::setPipedEventAdapter(const PipedEventAdapter<MouseEvent>* adapter) {
+        if(this->pipedEventAdapter == nullptr) {
+            this->pipedEventAdapter = adapter;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     bool MouseAdapter::processEvent(QObject* obj, QEvent* event) {
@@ -15,11 +25,18 @@ namespace Modeler {
 
             const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>( event );
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
-            QPoint mousePos = mouseEvent->pos();
+            QPoint qMousePos = mouseEvent->pos();
+            Core::Vector2u mousePos(qMousePos.x(), qMousePos.y());
             switch(eventType) {
                 case QEvent::MouseButtonPress:
                     buttonStatuses[buttonIndex].pressed = true;
-                    buttonStatuses[buttonIndex].pressedLocation.set(mousePos.x(), mousePos.y());
+                    buttonStatuses[buttonIndex].pressedLocation.copy(mousePos);
+                    if (this->pipedEventAdapter) {
+                        MouseEvent event(MouseEventType::ButtonDown);
+                        event.button = buttonIndex;
+                        event.position.copy(mousePos);
+                        this->pipedEventAdapter->accept(event);
+                    }
                     break;
                 case QEvent::MouseButtonRelease:
                     buttonStatuses[buttonIndex].pressed = false;
