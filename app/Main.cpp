@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     view.show();
 
     Modeler::ModelerApp modelerApp(&view);
-    modelerApp.addLoadedWindow("render_surface");
+    modelerApp.addLoadedWindow("render_surface", Modeler::ModelerApp::AppWindowType::RenderSurface);
 
     return app.exec();
 

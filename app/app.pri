@@ -9,7 +9,11 @@ HEADERS += \
     $$PWD/Demo.h \
     $$PWD/ModelerApp.h \
     $$PWD/ModelerAppWindow.h \
-    $$PWD/MouseAdapter.h
+    $$PWD/MouseAdapter.h \
+    $$PWD/GestureAdapter.h \
+    $$PWD/EventQueue.h \
+    $$PWD/Event.h \
+    $$PWD/Types.h
 
 SOURCES += \
     $$PWD/RenderSurface.cpp \
@@ -18,7 +22,9 @@ SOURCES += \
     $$PWD/Demo.cpp \
     $$PWD/ModelerApp.cpp \
     $$PWD/ModelerAppWindow.cpp \
-    $$PWD/MouseAdapter.cpp
+    $$PWD/MouseAdapter.cpp \
+    $$PWD/GestureAdapter.cpp \
+    $$PWD/Event.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc

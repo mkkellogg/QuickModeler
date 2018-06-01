@@ -12,13 +12,21 @@ namespace Modeler {
 
     class ModelerApp {
     public:
+
+        const static int MaxWindows = 32;
+
+        enum class AppWindowType {
+            None = 0,
+            RenderSurface = 1,
+        };
+
         ModelerApp(QQuickView* rootView);
-        bool addLoadedWindow(std::shared_ptr<ModelerAppWindow> window);
-        bool addLoadedWindow(const std::string& windowName);
+        bool addLoadedWindow(ModelerAppWindow* window, AppWindowType type);
+        bool addLoadedWindow(const std::string& windowName, AppWindowType type);
 
     private:
         QQuickView* rootView;
-        std::vector<std::shared_ptr<ModelerAppWindow>> appWindows;
+        ModelerAppWindow* liveWindows[MaxWindows];
     };
 }
 

@@ -6,24 +6,30 @@
 
 namespace Modeler {
     ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView) {
-
+        for (unsigned int i = 0; i < MaxWindows; i++) this->liveWindows[i] = nullptr;
     }
 
-    bool ModelerApp::addLoadedWindow(std::shared_ptr<ModelerAppWindow> window) {
-        if (std::find(this->appWindows.begin(), this->appWindows.end(), window) != this->appWindows.end()) {
-            this->appWindows.push_back(window);
+    bool ModelerApp::addLoadedWindow(ModelerAppWindow* window, AppWindowType type) {
+        if (this->liveWindows[(unsigned int)type] != nullptr) {
+            qDebug() << "Window type (" << (int)type << ") already added!";
+            return false;
         }
 
+        if (!window->initialize(this)) {
+            qDebug() << "Unable to initialize window!";
+            return false;
+        }
+        this->liveWindows[(unsigned int)type] = window;
         return true;
     }
 
-    bool ModelerApp::addLoadedWindow(const std::string& windowName) {
+    bool ModelerApp::addLoadedWindow(const std::string& windowName, AppWindowType type) {
         QObject *object = this->rootView->rootObject();
         QObject *rsObj = object->findChild<QObject*>(windowName.c_str());
         if (rsObj) {
-            Modeler::ModelerAppWindow* appWindow = dynamic_cast<Modeler::ModelerAppWindow*>(rsObj);
+            ModelerAppWindow* appWindow = dynamic_cast<Modeler::ModelerAppWindow*>(rsObj);
             if(appWindow) {
-                appWindow->initialize(this);
+                return this->addLoadedWindow(appWindow, type);
             }
             else {
                 qDebug() << "Unable to locate instance of app window!";
