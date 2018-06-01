@@ -4,7 +4,6 @@ namespace Modeler {
 
     MouseAdapter::MouseAdapter() {
 
-
     }
 
     bool MouseAdapter::processEvent(QObject* obj, QEvent* event) {
