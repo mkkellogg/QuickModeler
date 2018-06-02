@@ -48,5 +48,8 @@ namespace Modeler {
         void update();
         void render();
         void testDraw();
+
+        void resolveOnInits();
+        void resolveOnInit(OnInitCallback callback);
     };
 }

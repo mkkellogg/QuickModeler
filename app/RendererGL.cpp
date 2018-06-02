@@ -40,14 +40,27 @@ namespace Modeler {
           engineInitialized = true;
         }
 
-        for(std::vector<OnInitCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
-            OnInitCallback func = *itr;
-            func(this);
-        }
+        resolveOnInits();
     }
 
     void RendererGL::onInit(OnInitCallback func) {
-        onInits.push_back(func);
+        if (engineInitialized) {
+            resolveOnInit(func);
+        }
+        else {
+            onInits.push_back(func);
+        }
+    }
+
+    void RendererGL::resolveOnInits() {
+        for(std::vector<OnInitCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
+            OnInitCallback func = *itr;
+            resolveOnInit(func);
+        }
+    }
+
+    void RendererGL::resolveOnInit(OnInitCallback callback) {
+        callback(this);
     }
 
     bool RendererGL::isEngineInitialized() {
