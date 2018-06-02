@@ -8,7 +8,6 @@
 #include "RendererGL.h"
 #include "MouseAdapter.h"
 #include "GestureAdapter.h"
-#include "Demo.h"
 #include "Core/Engine.h"
 
 namespace Modeler  {

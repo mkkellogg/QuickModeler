@@ -38,6 +38,7 @@ namespace Modeler {
         PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
 
         std::shared_ptr<Core::Camera> renderCamera;
+        Core::Engine* engine;
     };
 }
 

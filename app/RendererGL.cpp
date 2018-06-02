@@ -40,13 +40,13 @@ namespace Modeler {
           engineInitialized = true;
         }
 
-        for(std::vector<std::function<void()>>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
-            std::function<void()>& func = *itr;
-            func();
+        for(std::vector<OnInitCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
+            OnInitCallback func = *itr;
+            func(this);
         }
     }
 
-    void RendererGL::onInit(std::function<void()>& func) {
+    void RendererGL::onInit(OnInitCallback func) {
         onInits.push_back(func);
     }
 

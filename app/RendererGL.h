@@ -14,6 +14,8 @@ namespace Modeler {
     class RendererGL : public QObject, protected QOpenGLFunctions {
         Q_OBJECT
     public:
+        typedef std::function<void(RendererGL*)> OnInitCallback;
+
         RendererGL();
         ~RendererGL();
 
@@ -25,11 +27,11 @@ namespace Modeler {
         void setWindow(QQuickWindow *window);
 
         Core::Engine& getEngine();
+        void onInit(OnInitCallback func);
+        bool isEngineInitialized();
 
     public slots:
         void paint();
-        void onInit(std::function<void()>& func);
-        bool isEngineInitialized();
 
     private:
         qreal m_t;
@@ -40,7 +42,7 @@ namespace Modeler {
         bool engineWindowSizeSet;
         Core::Engine * engine;
 
-        std::vector<std::function<void()>> onInits;
+        std::vector<OnInitCallback> onInits;
 
         void init();
         void update();
