@@ -34,17 +34,17 @@ namespace Modeler {
         PointerState& pointerState = pointerStates[pointerIndex];
         switch(event.getType()){
             case MouseAdapter::MouseEventType::ButtonDown:
-                if (!pointerState.active) {
+                //if (!pointerState.active) {
                     pointerState.active = true;
                     pointerState.startPosition = event.position;
                     pointerState.position = event.position;
-                }
+               // }
             break;
             case MouseAdapter::MouseEventType::ButtonUp:
-                if (pointerState.active) {
+                //if (pointerState.active) {
                     pointerState.active = false;
                     pointerState.position = event.position;
-                }
+               // }
             break;
             case MouseAdapter::MouseEventType::MouseMoved:
                 if (pointerState.active) {

@@ -25,7 +25,7 @@ namespace Modeler {
             MouseEvent(MouseEventType type): type(type) {}
             MouseEventType getType() {return  type;}
             unsigned int buttons;
-            Core::Vector2u position;
+            Core::Vector2i position;
         private:
             MouseEventType type;
         };
@@ -40,7 +40,7 @@ namespace Modeler {
         class MouseButtonStatus {
         public:
             bool pressed;
-            Core::Vector2u pressedLocation;
+            Core::Vector2i pressedLocation;
         };
 
         static const unsigned int MAX_BUTTONS = 16;

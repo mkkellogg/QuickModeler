@@ -6,6 +6,7 @@
 #include "ModelerApp.h"
 #include "RenderSurface.h"
 
+#include "Core/util/Time.h"
 #include "Core/scene/Scene.h"
 #include "Core/common/types.h"
 #include "Core/math/Math.h"
@@ -81,7 +82,53 @@ namespace Modeler {
             GestureAdapter::GestureEventType eventType = event.getType();
             switch(eventType) {
                 case GestureAdapter::GestureEventType::Drag:
-                    // printf("App Drag: [%u, %u] -> [%u, %u]\n", event.start.x, event.start.y, event.end.x, event.end.y);
+                {
+                    std::shared_ptr<Core::Renderer> renderer = this->engine->getRenderer();
+
+                    Core::Vector4u viewport = renderer->getViewport();
+                    Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;
+                    Core::Real ndcStartY = (Core::Real)event.start.y / viewport.w * 2.0f - 1.0f;
+                    Core::Real ndcEndX = (Core::Real)event.end.x / viewport.z * 2.0f - 1.0f;
+                    Core::Real ndcEndY = (Core::Real)event.end.y / viewport.w * 2.0f - 1.0f;
+
+                    Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
+                    float ndcDragLen = ndcDrag.magnitude();
+
+                    Core::Vector3r viewStart(ndcStartX, ndcEndY, 0.0f);
+                    Core::Vector3r viewEnd(ndcEndX, ndcStartY, 0.0f);
+                    renderCamera->unProject(viewStart);
+                    renderCamera->unProject(viewEnd);
+
+                    Core::Matrix4x4 viewMat = renderCamera->getTransform().getWorldMatrix();
+                    viewMat.transform(viewStart, true);
+                    viewMat.transform(viewEnd, true);
+
+                    Core::Vector3r dragVector = viewEnd - viewStart;
+
+                    Core::Vector3r rotAxis;
+                    Core::Vector3r::cross(viewEnd, viewStart, rotAxis);
+                    rotAxis.normalize();
+
+                    Core::Point3r cameraPos;
+                    renderCamera->getTransform().transform(cameraPos, true);
+                    float baseLen = cameraPos.magnitude();
+
+                    Core::Point3r rotated = cameraPos + dragVector;
+                    float rotatedLen = rotated.magnitude();
+
+                    float scaleFactor = baseLen / rotatedLen;
+                    rotated = rotated * scaleFactor;
+
+                    Core::Vector3r camVec(cameraPos.x, cameraPos.y, cameraPos.z);
+                    Core::Vector3r rotatedVec(rotated.x, rotated.y, rotated.z);
+                    Core::Quaternion qA;
+                    qA.fromAngleAxis(ndcDragLen * 2.0 , rotAxis);
+                    Core::Matrix4x4 rot = qA.rotationMatrix();
+
+                    renderCamera->getTransform().getLocalMatrix().preMultiply(rot);
+                    renderCamera->lookAt(Core::Point3r(0, 0, 0));
+
+                }
                 break;
             }
         }
@@ -94,27 +141,6 @@ namespace Modeler {
         std::shared_ptr<Core::BasicMaterial> skyboxMaterial;
         std::shared_ptr<Core::ImageLoader> imageLoader;
         std::shared_ptr<Core::AssetLoader> assetLoader;
-
-        engine.onUpdate([this](Core::Engine& engine) {
-            static Core::Real rotationAngle = 0.0;
-            if (renderCamera) {
-                rotationAngle += 0.01;
-                if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
-
-                Core::Quaternion qA;
-                qA.fromAngleAxis(rotationAngle, 0, 1, 0);
-                Core::Matrix4x4 rotationMatrixA;
-                qA.rotationMatrix(rotationMatrixA);
-
-                Core::Matrix4x4 worldMatrix;
-                worldMatrix.multiply(rotationMatrixA);
-                worldMatrix.translate(12, 0, 0);
-                worldMatrix.translate(0, 7, 0);
-                renderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
-                renderCamera->getTransform().updateWorldMatrix();
-                renderCamera->lookAt(Core::Point3r(0, 0, 0));
-              }
-            });
 
         std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
         engine.setScene(scene);
@@ -132,7 +158,7 @@ namespace Modeler {
             1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
             // top
             -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
-            -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
             // bottom
             -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
             -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0,
@@ -146,6 +172,33 @@ namespace Modeler {
         ASSERT(positionInited, "Unable to initialize skybox mesh vertex positions.");
         skyboxMesh->getVertexPositions()->store(vertexPositions);
 
+        Core::Real vertexColors[] = {
+            // back
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            // left
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            // right
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            // top
+            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
+            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
+            // bottom
+            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
+            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
+            // front
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+        };
+
+        skyboxMesh->enableAttribute(Core::StandardAttributes::Color);
+        Core::Bool colorInited = skyboxMesh->initVertexColors(36);
+        ASSERT(colorInited, "Unable to initialize skybox mesh vertex colors.");
+        skyboxMesh->getVertexColors()->store(vertexColors);
+
+
         skyboxMaterial = std::make_shared<Core::BasicMaterial>();
         skyboxMaterial->build();
 
@@ -157,5 +210,18 @@ namespace Modeler {
 
         renderCamera = std::make_shared<Core::Camera>();
         scene->getRoot()->addObject(renderCamera);
+
+        Core::Quaternion qA;
+        qA.fromAngleAxis(0.0, 0, 1, 0);
+        Core::Matrix4x4 rotationMatrixA;
+        qA.rotationMatrix(rotationMatrixA);
+
+        Core::Matrix4x4 worldMatrix;
+        worldMatrix.multiply(rotationMatrixA);
+        worldMatrix.translate(12, 0, 0);
+        worldMatrix.translate(0, 7, 0);
+        renderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
+        renderCamera->getTransform().updateWorldMatrix();
+        renderCamera->lookAt(Core::Point3r(0, 0, 0));
     }
 }

@@ -18,8 +18,8 @@ namespace Modeler {
             GestureEvent(GestureEventType type): type(type) {}
             GestureEventType getType() {return  type;}
             unsigned int button;
-            Core::Vector2u start;
-            Core::Vector2u end;
+            Core::Vector2i start;
+            Core::Vector2i end;
         private:
             GestureEventType type;
         };
@@ -35,8 +35,8 @@ namespace Modeler {
         class PointerState {
         public:
             bool active = false;
-            Core::Vector2u startPosition;
-            Core::Vector2u position;
+            Core::Vector2i startPosition;
+            Core::Vector2i position;
         };
 
         void onMouseEvent(MouseAdapter::MouseEvent event);

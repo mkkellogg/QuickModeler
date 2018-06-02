@@ -27,7 +27,7 @@ namespace Modeler {
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
 
             QPoint qMousePos = mouseEvent->pos();
-            Core::Vector2u mousePos(qMousePos.x(), qMousePos.y());
+            Core::Vector2i mousePos(qMousePos.x(), qMousePos.y());
             MouseEventType mouseEventType;
             switch(eventType) {
                 case QEvent::MouseButtonPress:
