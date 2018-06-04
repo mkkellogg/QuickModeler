@@ -33,7 +33,15 @@ namespace Modeler {
         viewMat.transform(viewStart, true);
         viewMat.transform(viewEnd, true);
 
+        viewStart = Core::Point3r(viewStart.x, viewStart.y, viewStart.z) - this->origin;
+        viewEnd = Core::Point3r(viewEnd.x, viewEnd.y, viewEnd.z) - this->origin;
+
         Core::Vector3r dragVector = viewEnd - viewStart;
+
+       // printf("[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]\n", viewStart.x, viewStart.y, viewStart.z, viewEnd.x, viewEnd.y, viewEnd.z, dragVector.x, dragVector.y, dragVector.z);
+
+        Core::Vector3r viewDragVector = viewEnd - viewStart;
+        viewDragVector.invert();
 
         Core::Vector3r rotAxis;
         Core::Vector3r::cross(viewEnd, viewStart, rotAxis);
@@ -55,8 +63,23 @@ namespace Modeler {
         qA.fromAngleAxis(ndcDragLen * 2.0 , rotAxis);
         Core::Matrix4x4 rot = qA.rotationMatrix();
 
-        targetCamera->getTransform().getLocalMatrix().preMultiply(rot);
-        targetCamera->lookAt(Core::Point3r(0, 0, 0));
+       // printf("%d\n", event.pointer);
+        if (event.pointer == 2) {
+            Core::Vector3r trans(dragVector.x, dragVector.y, dragVector.z);
+            trans.invert();
+            Core::Matrix4x4& localMatrix = targetCamera->getTransform().getLocalMatrix();
+            localMatrix.preTranslate((trans));
+            localMatrix.preMultiply(rot);
+            trans.invert();
+            localMatrix.preTranslate(trans);
+            targetCamera->lookAt(this->origin);
+        }
+        else if (event.pointer == 1) {
+            this->origin = this->origin + viewDragVector;
+            viewMat.invert();
+            viewMat.transform(viewDragVector, false);
+            targetCamera->getTransform().getLocalMatrix().preTranslate(viewDragVector);
+        }
 
     }
 }

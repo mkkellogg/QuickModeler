@@ -17,7 +17,7 @@ namespace Modeler {
         public:
             GestureEvent(GestureEventType type): type(type) {}
             GestureEventType getType() {return  type;}
-            unsigned int button;
+            unsigned int pointer;
             Core::Vector2i start;
             Core::Vector2i end;
         private:
