@@ -25,6 +25,7 @@ namespace Modeler {
 
             const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>( event );
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
+            //printf("button: %d, %d, %d\n", buttonIndex, mouseEvent->button(), mouseEvent->buttons());
 
             QPoint qMousePos = mouseEvent->pos();
             Core::Vector2i mousePos(qMousePos.x(), qMousePos.y());

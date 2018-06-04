@@ -11,10 +11,7 @@ namespace Modeler {
     }
 
     RendererGL::~RendererGL() {
-        if (this->engine != nullptr) {
-            delete this->engine;
-            this->engine = nullptr;
-        }
+
     }
 
 
@@ -29,13 +26,13 @@ namespace Modeler {
 
     }
 
-    Core::Engine& RendererGL::getEngine() {
-        return *engine;
+    std::shared_ptr<Core::Engine> RendererGL::getEngine() {
+        return engine;
     }
 
     void RendererGL::init() {
         if (!engineInitialized) {
-          engine = new Core::Engine(Core::Engine::GLVersion::Three);
+          engine = std::make_shared<Core::Engine>(Core::Engine::GLVersion::Three);
           engine->init();
           engineInitialized = true;
         }

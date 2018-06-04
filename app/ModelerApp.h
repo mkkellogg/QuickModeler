@@ -9,6 +9,7 @@
 #include "ModelerAppWindow.h"
 #include "GestureAdapter.h"
 #include "PipedEventAdapter.h"
+#include "OrbitControls.h"
 
 #include "Core/Engine.h"
 
@@ -31,12 +32,13 @@ namespace Modeler {
     private:
 
         void onGesture(GestureAdapter::GestureEvent event);
-        void onEngineReady(Core::Engine& engine);
+        void onEngineReady(std::shared_ptr<Core::Engine> engine);
 
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
+        OrbitControls* orbitControls;
         std::shared_ptr<Core::Camera> renderCamera;
-        Core::Engine* engine;
+        std::shared_ptr<Core::Engine> engine;
         PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
     };
 }

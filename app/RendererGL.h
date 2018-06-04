@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <memory>
 
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLFunctions>
@@ -26,7 +27,7 @@ namespace Modeler {
         void setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
         void setWindow(QQuickWindow *window);
 
-        Core::Engine& getEngine();
+        std::shared_ptr<Core::Engine> getEngine();
         void onInit(OnInitCallback func);
         bool isEngineInitialized();
 
@@ -40,7 +41,7 @@ namespace Modeler {
         bool initialized;
         bool engineInitialized;
         bool engineWindowSizeSet;
-        Core::Engine * engine;
+        std::shared_ptr<Core::Engine> engine;
 
         std::vector<OnInitCallback> onInits;
 

@@ -24,7 +24,7 @@
 #include "Core/image/CubeTexture.h"
 
 namespace Modeler {
-    ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView), engine(nullptr),
+    ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView), orbitControls(nullptr), engine(nullptr),
         pipedGestureAdapter(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1)) {
         for (unsigned int i = 0; i < MaxWindows; i++) this->liveWindows[i] = nullptr;
     }
@@ -50,12 +50,11 @@ namespace Modeler {
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
             if (renderSurface) {
                 RendererGL::OnInitCallback initer = [this](RendererGL* renderer) {
-                    this->engine = &renderer->getEngine();
-                    this->onEngineReady(*engine);
+                    this->engine = renderer->getEngine();
+                    this->onEngineReady(engine);
                 };
                 renderSurface->getRenderer()->onInit(initer);
             }
-
         }
 
         return true;
@@ -83,58 +82,14 @@ namespace Modeler {
             switch(eventType) {
                 case GestureAdapter::GestureEventType::Drag:
                 {
-                    std::shared_ptr<Core::Renderer> renderer = this->engine->getRenderer();
-
-                    Core::Vector4u viewport = renderer->getViewport();
-                    Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;
-                    Core::Real ndcStartY = (Core::Real)event.start.y / viewport.w * 2.0f - 1.0f;
-                    Core::Real ndcEndX = (Core::Real)event.end.x / viewport.z * 2.0f - 1.0f;
-                    Core::Real ndcEndY = (Core::Real)event.end.y / viewport.w * 2.0f - 1.0f;
-
-                    Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
-                    float ndcDragLen = ndcDrag.magnitude();
-
-                    Core::Vector3r viewStart(ndcStartX, ndcEndY, 0.0f);
-                    Core::Vector3r viewEnd(ndcEndX, ndcStartY, 0.0f);
-                    renderCamera->unProject(viewStart);
-                    renderCamera->unProject(viewEnd);
-
-                    Core::Matrix4x4 viewMat = renderCamera->getTransform().getWorldMatrix();
-                    viewMat.transform(viewStart, true);
-                    viewMat.transform(viewEnd, true);
-
-                    Core::Vector3r dragVector = viewEnd - viewStart;
-
-                    Core::Vector3r rotAxis;
-                    Core::Vector3r::cross(viewEnd, viewStart, rotAxis);
-                    rotAxis.normalize();
-
-                    Core::Point3r cameraPos;
-                    renderCamera->getTransform().transform(cameraPos, true);
-                    float baseLen = cameraPos.magnitude();
-
-                    Core::Point3r rotated = cameraPos + dragVector;
-                    float rotatedLen = rotated.magnitude();
-
-                    float scaleFactor = baseLen / rotatedLen;
-                    rotated = rotated * scaleFactor;
-
-                    Core::Vector3r camVec(cameraPos.x, cameraPos.y, cameraPos.z);
-                    Core::Vector3r rotatedVec(rotated.x, rotated.y, rotated.z);
-                    Core::Quaternion qA;
-                    qA.fromAngleAxis(ndcDragLen * 2.0 , rotAxis);
-                    Core::Matrix4x4 rot = qA.rotationMatrix();
-
-                    renderCamera->getTransform().getLocalMatrix().preMultiply(rot);
-                    renderCamera->lookAt(Core::Point3r(0, 0, 0));
-
+                    this->orbitControls->handleGesture((event));
                 }
                 break;
             }
         }
     }
 
-    void ModelerApp::onEngineReady(Core::Engine& engine) {
+    void ModelerApp::onEngineReady(std::shared_ptr<Core::Engine> engine) {
 
         std::vector<std::shared_ptr<Core::RawImage>> skyboxImages;
         std::shared_ptr<Core::CubeTexture> skyboxTexture;
@@ -143,7 +98,7 @@ namespace Modeler {
         std::shared_ptr<Core::AssetLoader> assetLoader;
 
         std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
-        engine.setScene(scene);
+        engine->setScene(scene);
 
         std::shared_ptr<Core::Mesh> skyboxMesh = std::make_shared<Core::Mesh>(36, false);
         Core::Real vertexPositions[] = {
@@ -223,5 +178,7 @@ namespace Modeler {
         renderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
         renderCamera->getTransform().updateWorldMatrix();
         renderCamera->lookAt(Core::Point3r(0, 0, 0));
+
+        this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
     }
 }

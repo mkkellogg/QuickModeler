@@ -47,6 +47,8 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+
            // onClicked: { console.log("Bar"); }
         }
         /*MouseArea {
