@@ -13,6 +13,7 @@
 #include "Core/math/Matrix4x4.h"
 #include "Core/math/Quaternion.h"
 #include "Core/render/Camera.h"
+#include "Core/color/Color.h"
 #include "Core/material/StandardAttributes.h"
 #include "Core/geometry/Mesh.h"
 #include "Core/render/RenderableContainer.h"
@@ -91,17 +92,11 @@ namespace Modeler {
 
     void ModelerApp::onEngineReady(std::shared_ptr<Core::Engine> engine) {
 
-        std::vector<std::shared_ptr<Core::RawImage>> skyboxImages;
-        std::shared_ptr<Core::CubeTexture> skyboxTexture;
-        std::shared_ptr<Core::BasicMaterial> skyboxMaterial;
-        std::shared_ptr<Core::ImageLoader> imageLoader;
-        std::shared_ptr<Core::AssetLoader> assetLoader;
-
         std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
         engine->setScene(scene);
 
-        std::shared_ptr<Core::Mesh> skyboxMesh = std::make_shared<Core::Mesh>(36, false);
-        Core::Real vertexPositions[] = {
+        // ======= Setup Cube =================
+        Core::Real cubeVertexPositions[] = {
             // back
             -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
             -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
@@ -122,12 +117,7 @@ namespace Modeler {
             1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0
         };
 
-        skyboxMesh->enableAttribute(Core::StandardAttributes::Position);
-        Core::Bool positionInited = skyboxMesh->initVertexPositions(36);
-        ASSERT(positionInited, "Unable to initialize skybox mesh vertex positions.");
-        skyboxMesh->getVertexPositions()->store(vertexPositions);
-
-        Core::Real vertexColors[] = {
+        Core::Real cubeVertexColors[] = {
             // back
             1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
             1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
@@ -148,20 +138,82 @@ namespace Modeler {
             1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
         };
 
-        skyboxMesh->enableAttribute(Core::StandardAttributes::Color);
-        Core::Bool colorInited = skyboxMesh->initVertexColors(36);
-        ASSERT(colorInited, "Unable to initialize skybox mesh vertex colors.");
-        skyboxMesh->getVertexColors()->store(vertexColors);
+        std::shared_ptr<Core::BasicMaterial> cubeMaterial = std::make_shared<Core::BasicMaterial>();
+        cubeMaterial->build();
+
+        std::shared_ptr<Core::Mesh> bigCube = std::make_shared<Core::Mesh>(36, false);
+        bigCube->enableAttribute(Core::StandardAttributes::Position);
+        Core::Bool positionInited = bigCube->initVertexPositions(36);
+        ASSERT(positionInited, "Unable to initialize big cube mesh vertex positions.");
+        bigCube->getVertexPositions()->store(cubeVertexPositions);
+
+        bigCube->enableAttribute(Core::StandardAttributes::Color);
+        Core::Bool colorInited = bigCube->initVertexColors(36);
+        ASSERT(colorInited, "Unable to initialize big cube mesh vertex colors.");
+        bigCube->getVertexColors()->store(cubeVertexColors);
+
+        std::shared_ptr<Core::RenderableContainer<Core::Mesh>> bigCubeObj = std::make_shared<Core::RenderableContainer<Core::Mesh>>();
+        std::shared_ptr<Core::MeshRenderer> bigCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, bigCubeObj);
+        bigCubeObj->addRenderable(bigCube);
+        bigCubeObj->setRenderer(bigCubeRenderer);
+        scene->getRoot()->addObject(bigCubeObj);
+        bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
 
 
-        skyboxMaterial = std::make_shared<Core::BasicMaterial>();
-        skyboxMaterial->build();
 
-        std::shared_ptr<Core::RenderableContainer<Core::Mesh>> skyboxObj = std::make_shared<Core::RenderableContainer<Core::Mesh>>();
-        std::shared_ptr<Core::MeshRenderer> skyboxRenderer = std::make_shared<Core::MeshRenderer>(skyboxMaterial, skyboxObj);
-        skyboxObj->addRenderable(skyboxMesh);
-        skyboxObj->setRenderer(skyboxRenderer);
-        scene->getRoot()->addObject(skyboxObj);
+        std::shared_ptr<Core::Mesh> smallCube = std::make_shared<Core::Mesh>(36, false);
+        smallCube->enableAttribute(Core::StandardAttributes::Position);
+        positionInited = smallCube->initVertexPositions(36);
+        ASSERT(positionInited, "Unable to initialize small cube mesh vertex positions.");
+        smallCube->getVertexPositions()->store(cubeVertexPositions);
+
+        smallCube->enableAttribute(Core::StandardAttributes::Color);
+        colorInited = smallCube->initVertexColors(36);
+        ASSERT(colorInited, "Unable to initialize small cube mesh vertex colors.");
+        smallCube->getVertexColors()->store(cubeVertexColors);
+
+        std::shared_ptr<Core::RenderableContainer<Core::Mesh>> smallCubeObj = std::make_shared<Core::RenderableContainer<Core::Mesh>>();
+        std::shared_ptr<Core::MeshRenderer> smallCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, smallCubeObj);
+        smallCubeObj->addRenderable(smallCube);
+        smallCubeObj->setRenderer(smallCubeRenderer);
+        scene->getRoot()->addObject(smallCubeObj);
+        smallCubeObj->getTransform().getLocalMatrix().scale(Core::Vector3r(0.5f, 0.5f, 0.5f));
+        smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
+
+        // ======= Setup Plane =================
+
+        std::shared_ptr<Core::Mesh> planeMesh = std::make_shared<Core::Mesh>(6, false);
+        Core::Real planeVertexPositions[] = {
+            -7.0, 0.0, -7.0, 1.0, 7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0,
+            7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0, 7.0, 0.0, 7.0, 1.0,
+        };
+
+        planeMesh->enableAttribute(Core::StandardAttributes::Position);
+        Core::Bool planePositionInited = planeMesh->initVertexPositions(6);
+        ASSERT(planePositionInited, "Unable to initialize plane mesh vertex positions.");
+        planeMesh->getVertexPositions()->store(planeVertexPositions);
+
+        Core::Real planeVertexColors[] = {
+            0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f,
+            0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f,
+        };
+
+        planeMesh->enableAttribute(Core::StandardAttributes::Color);
+        Core::Bool planeColorInited = planeMesh->initVertexColors(6);
+        ASSERT(planeColorInited, "Unable to initialize plane mesh vertex colors.");
+        planeMesh->getVertexColors()->store(planeVertexColors);
+
+
+        std::shared_ptr<Core::BasicMaterial> planeMaterial = std::make_shared<Core::BasicMaterial>();
+        planeMaterial->build();
+
+        std::shared_ptr<Core::RenderableContainer<Core::Mesh>> planeObj = std::make_shared<Core::RenderableContainer<Core::Mesh>>();
+        std::shared_ptr<Core::MeshRenderer> planeRenderer = std::make_shared<Core::MeshRenderer>(planeMaterial, planeObj);
+        planeObj->addRenderable(planeMesh);
+        planeObj->setRenderer(planeRenderer);
+        scene->getRoot()->addObject(planeObj);
+
+
 
         renderCamera = std::make_shared<Core::Camera>();
         scene->getRoot()->addObject(renderCamera);
