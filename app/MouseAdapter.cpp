@@ -1,4 +1,5 @@
 #include "MouseAdapter.h"
+#include "Settings.h"
 
 namespace Modeler {
 
@@ -62,7 +63,7 @@ namespace Modeler {
     unsigned int MouseAdapter::getMouseButtonIndex(const Qt::MouseButton& button) {
         if(button == Qt::LeftButton) {return 1;}
         else if(button == Qt::RightButton) {return 2;}
-        else if((button == Qt::MiddleButton) || (button == Qt::MidButton)) {return 3;}
+        else if((button == Qt::MiddleButton) || (button == Qt::MidButton || button == Settings::AltMiddleButton)) {return 3;}
         else if(button == Qt::XButton1){return 4;}
         else if(button == Qt::XButton2){return 5;}
         else return 0;
