@@ -21,9 +21,6 @@ namespace Modeler {
         Core::Real ndcEndX = (Core::Real)event.end.x / viewport.z * 2.0f - 1.0f;
         Core::Real ndcEndY = (Core::Real)event.end.y / viewport.w * 2.0f - 1.0f;
 
-        Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
-        float ndcDragLen = ndcDrag.magnitude();
-
         Core::Vector3r viewStart(ndcStartX, ndcEndY, 0.0f);
         Core::Vector3r viewEnd(ndcEndX, ndcStartY, 0.0f);
         targetCamera->unProject(viewStart);
@@ -36,48 +33,41 @@ namespace Modeler {
         viewStart = Core::Point3r(viewStart.x, viewStart.y, viewStart.z) - this->origin;
         viewEnd = Core::Point3r(viewEnd.x, viewEnd.y, viewEnd.z) - this->origin;
 
-        Core::Vector3r dragVector = viewEnd - viewStart;
-
-       // printf("[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]\n", viewStart.x, viewStart.y, viewStart.z, viewEnd.x, viewEnd.y, viewEnd.z, dragVector.x, dragVector.y, dragVector.z);
-
-        Core::Vector3r viewDragVector = viewEnd - viewStart;
-        viewDragVector.invert();
-
         Core::Vector3r rotAxis;
         Core::Vector3r::cross(viewEnd, viewStart, rotAxis);
         rotAxis.normalize();
 
         Core::Point3r cameraPos;
+        cameraPos.set(0, 0, 0);
         targetCamera->getTransform().transform(cameraPos, true);
-        float baseLen = cameraPos.magnitude();
+        cameraPos.set(cameraPos.x - this->origin.x, cameraPos.y - this->origin.y, cameraPos.z - this->origin.z);
+        Core::Real distanceFromOrigin = cameraPos.magnitude();
 
-        Core::Point3r rotated = cameraPos + dragVector;
-        float rotatedLen = rotated.magnitude();
-
-        float scaleFactor = baseLen / rotatedLen;
-        rotated = rotated * scaleFactor;
-
-        Core::Vector3r camVec(cameraPos.x, cameraPos.y, cameraPos.z);
-        Core::Vector3r rotatedVec(rotated.x, rotated.y, rotated.z);
-        Core::Quaternion qA;
-        qA.fromAngleAxis(ndcDragLen * 2.0 , rotAxis);
-        Core::Matrix4x4 rot = qA.rotationMatrix();
-
-       // printf("%d\n", event.pointer);
         if (event.pointer == 2) {
-            Core::Vector3r trans(dragVector.x, dragVector.y, dragVector.z);
-            trans.invert();
+
+            Core::Real rotationScaleFactor = distanceFromOrigin * 0.1f;
+            Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
+            float ndcDragLen = ndcDrag.magnitude();
+            Core::Quaternion qA;
+            qA.fromAngleAxis(ndcDragLen * rotationScaleFactor, rotAxis);
+            Core::Matrix4x4 rot = qA.rotationMatrix();
+
+            Core::Vector3r orgVec(this->origin.x, this->origin.y, this->origin.z);
             Core::Matrix4x4& localMatrix = targetCamera->getTransform().getLocalMatrix();
-            localMatrix.preTranslate((trans));
+            orgVec.invert();
+            localMatrix.preTranslate(orgVec);
             localMatrix.preMultiply(rot);
-            trans.invert();
-            localMatrix.preTranslate(trans);
+            orgVec.invert();
+            localMatrix.preTranslate(orgVec);
             targetCamera->lookAt(this->origin);
+
         }
-        else if (event.pointer == 1) {
+        else if (event.pointer == 3) {
+            Core::Real translationScaleFactor = distanceFromOrigin * 0.5f;
+            Core::Vector3r viewDragVector = viewEnd - viewStart;
+            viewDragVector.invert();
+            viewDragVector = viewDragVector * translationScaleFactor;
             this->origin = this->origin + viewDragVector;
-            viewMat.invert();
-            viewMat.transform(viewDragVector, false);
             targetCamera->getTransform().getLocalMatrix().preTranslate(viewDragVector);
         }
 
