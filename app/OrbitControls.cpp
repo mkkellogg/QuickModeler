@@ -43,7 +43,8 @@ namespace Modeler {
         cameraPos.set(cameraPos.x - this->origin.x, cameraPos.y - this->origin.y, cameraPos.z - this->origin.z);
         Core::Real distanceFromOrigin = cameraPos.magnitude();
 
-        if (event.pointer == 2) {
+        using GesturePointer = GestureAdapter::GesturePointer;
+        if (event.pointer == GesturePointer::Secondary) {
 
             Core::Real rotationScaleFactor = distanceFromOrigin * 0.1f;
             Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
@@ -62,7 +63,7 @@ namespace Modeler {
             targetCamera->lookAt(this->origin);
 
         }
-        else if (event.pointer == 3) {
+        else if (event.pointer == GesturePointer::Tertiary) {
             Core::Real translationScaleFactor = distanceFromOrigin * 0.5f;
             Core::Vector3r viewDragVector = viewEnd - viewStart;
             viewDragVector.invert();

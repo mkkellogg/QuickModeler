@@ -13,11 +13,18 @@ namespace Modeler {
             Drag = 0,
         };
 
+        enum class GesturePointer {
+            Primary = 1,
+            Secondary = 2,
+            Tertiary = 4,
+            PrimaryDouble = 3,
+        };
+
         class GestureEvent {
         public:
             GestureEvent(GestureEventType type): type(type) {}
             GestureEventType getType() {return  type;}
-            unsigned int pointer;
+            GesturePointer pointer;
             Core::Vector2i start;
             Core::Vector2i end;
         private:

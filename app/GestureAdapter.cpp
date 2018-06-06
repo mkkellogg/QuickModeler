@@ -23,12 +23,7 @@ namespace Modeler {
 
     void GestureAdapter::onMouseEvent(MouseAdapter::MouseEvent event) {
 
-        unsigned int pointerIndex = 0;
-        unsigned int buttons = event.buttons;
-        while(buttons != 0) {
-            pointerIndex++;
-            buttons = buttons >> 1;
-        }
+        unsigned int pointerIndex = event.buttons;
         if (pointerIndex >= MAX_POINTERS) return;
 
         PointerState& pointerState = pointerStates[pointerIndex];
@@ -47,7 +42,7 @@ namespace Modeler {
                     GestureEvent gestureEvent(GestureEventType::Drag);
                     gestureEvent.start = pointerState.position;
                     gestureEvent.end =  event.position;
-                    gestureEvent.pointer = pointerIndex;
+                    gestureEvent.pointer = (GesturePointer)pointerIndex;
                     if (this->pipedEventAdapter) {
                         this->pipedEventAdapter->accept(gestureEvent);
                     }
