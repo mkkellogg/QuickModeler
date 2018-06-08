@@ -1,12 +1,12 @@
 
 #include <memory>
 
-#include "OrbitControls.h"
-#include "Util.h"
-
 #include "Core/geometry/Vector3.h"
 #include "Core/math/Matrix4x4.h"
 #include "Core/math/Quaternion.h"
+#include "Core/util/ValidWeakPointer.h"
+
+#include "OrbitControls.h"
 
 namespace Modeler {
     OrbitControls::OrbitControls(std::weak_ptr<Core::Engine> engine, std::weak_ptr<Core::Camera> targetCamera): engine(engine), targetCamera(targetCamera) {
@@ -15,10 +15,11 @@ namespace Modeler {
 
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
 
-        std::shared_ptr<Core::Engine> enginePtr = Util::expectValidWeakPointer<Core::Engine>(this->engine);
+        Core::ValidWeakPointer<Core::Engine> enginePtr(this->engine);
+
         std::shared_ptr<Core::Renderer> renderer = enginePtr->getRenderer();
 
-        std::shared_ptr<Core::Camera> targetCameraPtr =  Util::expectValidWeakPointer<Core::Camera>(this->targetCamera);
+        Core::ValidWeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
 
         Core::Vector4u viewport = renderer->getViewport();
         Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;

@@ -1,3 +1,5 @@
+#include "Core/util/ValidWeakPointer.h"
+
 #include "MouseAdapter.h"
 #include "Settings.h"
 #include "Util.h"
@@ -53,7 +55,7 @@ namespace Modeler {
                 MouseEvent event(mouseEventType);
                 event.buttons = pressedButtonMask;
                 event.position = mousePos;
-                auto adapterPtr = Util::expectValidWeakPointer<PipedEventAdapter<MouseEvent>>(this->pipedEventAdapter);
+                Core::ValidWeakPointer<PipedEventAdapter<MouseEvent>> adapterPtr(this->pipedEventAdapter);
                 adapterPtr->accept(event);
             }
             return true;

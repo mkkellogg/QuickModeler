@@ -16,7 +16,6 @@ HEADERS += \
     $$PWD/PipedEventAdapter.h \
     $$PWD/OrbitControls.h \
     $$PWD/Settings.h \
-    $$PWD/Util.h \
     $$PWD/Exception.h
 
 SOURCES += \

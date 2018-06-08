@@ -24,6 +24,7 @@
 #include "Core/material/StandardAttributes.h"
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
+#include "Core/util/ValidWeakPointer.h"
 
 namespace Modeler {
     ModelerApp::ModelerApp(QQuickView* rootView):  engineReady(false), rootView(rootView), orbitControls(nullptr) {
@@ -93,9 +94,13 @@ namespace Modeler {
 
     void ModelerApp::onEngineReady(std::weak_ptr<Core::Engine> engine) {
         this->engineReady = true;
-        std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
-        std::shared_ptr<Core::Engine> enginePtr = Util::expectValidWeakPointer<Core::Engine>(engine);
-        enginePtr->setScene(scene);
+
+        Core::ValidWeakPointer<Core::Engine> enginePtr(engine);
+
+        std::weak_ptr<Core::Scene> scene = enginePtr->createScene();
+        enginePtr->setActiveScene(scene);
+
+        Core::ValidWeakPointer<Core::Scene> scenePtr(scene);
 
         // ======= Setup Cube =================
         Core::Real cubeVertexPositions[] = {
@@ -158,7 +163,7 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> bigCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, bigCubeObj);
         bigCubeObj->addRenderable(bigCube);
         bigCubeObj->setRenderer(bigCubeRenderer);
-        scene->getRoot()->addObject(bigCubeObj);
+        scenePtr->getRoot()->addObject(bigCubeObj);
         bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
 
 
@@ -178,7 +183,7 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> smallCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, smallCubeObj);
         smallCubeObj->addRenderable(smallCube);
         smallCubeObj->setRenderer(smallCubeRenderer);
-        scene->getRoot()->addObject(smallCubeObj);
+        scenePtr->getRoot()->addObject(smallCubeObj);
         smallCubeObj->getTransform().getLocalMatrix().scale(Core::Vector3r(0.5f, 0.5f, 0.5f));
         smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
 
@@ -213,13 +218,13 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> planeRenderer = std::make_shared<Core::MeshRenderer>(planeMaterial, planeObj);
         planeObj->addRenderable(planeMesh);
         planeObj->setRenderer(planeRenderer);
-        scene->getRoot()->addObject(planeObj);
+        scenePtr->getRoot()->addObject(planeObj);
 
 
 
         std::shared_ptr<Core::Camera> sharedRenderCamera = std::make_shared<Core::Camera>();
         this->renderCamera = sharedRenderCamera;
-        scene->getRoot()->addObject(sharedRenderCamera);
+        scenePtr->getRoot()->addObject(sharedRenderCamera);
 
         Core::Quaternion qA;
         qA.fromAngleAxis(0.0, 0, 1, 0);
