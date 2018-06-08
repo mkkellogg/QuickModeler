@@ -38,7 +38,7 @@ namespace Modeler {
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
         OrbitControls* orbitControls;
-        std::shared_ptr<Core::Camera> renderCamera;
+        std::weak_ptr<Core::Camera> renderCamera;
         std::weak_ptr<Core::Engine> engine;
         PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
     };

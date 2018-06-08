@@ -216,8 +216,9 @@ namespace Modeler {
 
 
 
-        renderCamera = std::make_shared<Core::Camera>();
-        scene->getRoot()->addObject(renderCamera);
+        std::shared_ptr<Core::Camera> sharedRenderCamera = std::make_shared<Core::Camera>();
+        this->renderCamera = sharedRenderCamera;
+        scene->getRoot()->addObject(sharedRenderCamera);
 
         Core::Quaternion qA;
         qA.fromAngleAxis(0.0, 0, 1, 0);
@@ -228,9 +229,9 @@ namespace Modeler {
         worldMatrix.multiply(rotationMatrixA);
         worldMatrix.translate(12, 0, 0);
         worldMatrix.translate(0, 7, 0);
-        renderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
-        renderCamera->getTransform().updateWorldMatrix();
-        renderCamera->lookAt(Core::Point3r(0, 0, 0));
+        sharedRenderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
+        sharedRenderCamera->getTransform().updateWorldMatrix();
+        sharedRenderCamera->lookAt(Core::Point3r(0, 0, 0));
 
         this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
     }
