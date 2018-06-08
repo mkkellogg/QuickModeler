@@ -15,7 +15,9 @@ HEADERS += \
     $$PWD/Types.h \
     $$PWD/PipedEventAdapter.h \
     $$PWD/OrbitControls.h \
-    $$PWD/Settings.h
+    $$PWD/Settings.h \
+    $$PWD/Util.h \
+    $$PWD/Exception.h
 
 SOURCES += \
     $$PWD/RenderSurface.cpp \
@@ -27,7 +29,8 @@ SOURCES += \
     $$PWD/GestureAdapter.cpp \
     $$PWD/Event.cpp \
     $$PWD/OrbitControls.cpp \
-    $$PWD/Settings.cpp
+    $$PWD/Settings.cpp \
+    $$PWD/Util.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc

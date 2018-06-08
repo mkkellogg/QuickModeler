@@ -5,6 +5,7 @@
 
 #include "ModelerApp.h"
 #include "RenderSurface.h"
+#include "Util.h"
 
 #include "Core/util/Time.h"
 #include "Core/scene/Scene.h"
@@ -93,7 +94,7 @@ namespace Modeler {
     void ModelerApp::onEngineReady(std::weak_ptr<Core::Engine> engine) {
         this->engineReady = true;
         std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
-        std::shared_ptr<Core::Engine> enginePtr = engine.lock();
+        std::shared_ptr<Core::Engine> enginePtr = Util::expectValidWeakPointer<Core::Engine>(engine);
         enginePtr->setScene(scene);
 
         // ======= Setup Cube =================
