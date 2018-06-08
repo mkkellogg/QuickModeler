@@ -25,7 +25,7 @@
 #include "Core/image/CubeTexture.h"
 
 namespace Modeler {
-    ModelerApp::ModelerApp(QQuickView* rootView): rootView(rootView), orbitControls(nullptr), engine(nullptr),
+    ModelerApp::ModelerApp(QQuickView* rootView):  engineReady(false), rootView(rootView), orbitControls(nullptr),
         pipedGestureAdapter(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1)) {
         for (unsigned int i = 0; i < MaxWindows; i++) this->liveWindows[i] = nullptr;
     }
@@ -78,7 +78,7 @@ namespace Modeler {
     }
 
     void ModelerApp::onGesture(GestureAdapter::GestureEvent event) {
-        if (this->engine) {
+        if (this->engineReady) {
             GestureAdapter::GestureEventType eventType = event.getType();
             switch(eventType) {
                 case GestureAdapter::GestureEventType::Drag:
@@ -90,10 +90,11 @@ namespace Modeler {
         }
     }
 
-    void ModelerApp::onEngineReady(std::shared_ptr<Core::Engine> engine) {
-
+    void ModelerApp::onEngineReady(std::weak_ptr<Core::Engine> engine) {
+        this->engineReady = true;
         std::shared_ptr<Core::Scene> scene = std::make_shared<Core::Scene>();
-        engine->setScene(scene);
+        std::shared_ptr<Core::Engine> enginePtr = engine.lock();
+        enginePtr->setScene(scene);
 
         // ======= Setup Cube =================
         Core::Real cubeVertexPositions[] = {

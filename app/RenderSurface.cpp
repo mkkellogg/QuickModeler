@@ -2,7 +2,8 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    RenderSurface::RenderSurface(): initialized(false), m_t(0){
+
+    RenderSurface::RenderSurface(): initialized(false), m_t(0) {
         connect(this, &QQuickItem::windowChanged, this, &RenderSurface::handleWindowChanged);
     }
 

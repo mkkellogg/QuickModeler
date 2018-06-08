@@ -5,8 +5,8 @@
 #include <QtGui/QOpenGLContext>
 
 namespace Modeler {
-    RendererGL::RendererGL() : m_t(0), m_window(nullptr), initialized(false),
-                                       engineInitialized(false), engineWindowSizeSet(false), engine(nullptr) {
+
+    RendererGL::RendererGL() : m_t(0), m_window(nullptr), initialized(false), engineInitialized(false), engineWindowSizeSet(false), engine(nullptr) {
 
     }
 
@@ -14,19 +14,16 @@ namespace Modeler {
 
     }
 
-
     void RendererGL::paint() {
         if (!initialized) {
             init();
             initialized = true;
         }
-
         update();
         render();
-
     }
 
-    std::shared_ptr<Core::Engine> RendererGL::getEngine() {
+    std::weak_ptr<Core::Engine> RendererGL::getEngine() {
         return engine;
     }
 
@@ -36,7 +33,6 @@ namespace Modeler {
           engine->init();
           engineInitialized = true;
         }
-
         resolveOnInits();
     }
 

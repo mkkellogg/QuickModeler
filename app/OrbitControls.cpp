@@ -8,12 +8,14 @@
 #include "Core/math/Quaternion.h"
 
 namespace Modeler {
-    OrbitControls::OrbitControls(std::shared_ptr<Core::Engine> engine, std::shared_ptr<Core::Camera> targetCamera): engine(engine), targetCamera(targetCamera) {
+    OrbitControls::OrbitControls(std::weak_ptr<Core::Engine> engine, std::shared_ptr<Core::Camera> targetCamera): engine(engine), targetCamera(targetCamera) {
 
     }
 
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
-        std::shared_ptr<Core::Renderer> renderer = this->engine->getRenderer();
+
+        std::shared_ptr<Core::Engine> enginePtr = this->engine.lock();
+        std::shared_ptr<Core::Renderer> renderer = enginePtr->getRenderer();
 
         Core::Vector4u viewport = renderer->getViewport();
         Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;

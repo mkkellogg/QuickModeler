@@ -27,7 +27,7 @@ namespace Modeler {
         void setViewport(unsigned int hOffset, unsigned int vOffset, unsigned int vpWidth, unsigned int vpHeight);
         void setWindow(QQuickWindow *window);
 
-        std::shared_ptr<Core::Engine> getEngine();
+        std::weak_ptr<Core::Engine> getEngine();
         void onInit(OnInitCallback func);
         bool isEngineInitialized();
 
