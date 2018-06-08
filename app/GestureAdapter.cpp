@@ -1,18 +1,19 @@
 #include <functional>
 
 #include "GestureAdapter.h"
+#include "Util.h"
 
 namespace Modeler {
-    GestureAdapter::GestureAdapter(): mouseEventAdapter(std::bind(&GestureAdapter::onMouseEvent, this, std::placeholders::_1)) {
-
+    GestureAdapter::GestureAdapter() {
+        mouseEventAdapter = std::make_shared<PipedEventAdapter<MouseAdapter::MouseEvent>>(std::bind(&GestureAdapter::onMouseEvent, this, std::placeholders::_1));
     }
 
     void GestureAdapter::setMouseAdapter(MouseAdapter& mouseAdapter) {
-        mouseAdapter.setPipedEventAdapter(&this->mouseEventAdapter);
+        mouseAdapter.setPipedEventAdapter(this->mouseEventAdapter);
     }
 
-    bool GestureAdapter::setPipedEventAdapter(const PipedEventAdapter<GestureEvent>* adapter) {
-        if(this->pipedEventAdapter == nullptr) {
+    bool GestureAdapter::setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<GestureEvent>> adapter) {
+        if(this->pipedEventAdapter.expired()) {
             this->pipedEventAdapter = adapter;
             return true;
         }
@@ -43,8 +44,9 @@ namespace Modeler {
                     gestureEvent.start = pointerState.position;
                     gestureEvent.end =  event.position;
                     gestureEvent.pointer = (GesturePointer)pointerIndex;
-                    if (this->pipedEventAdapter) {
-                        this->pipedEventAdapter->accept(gestureEvent);
+                    if (!this->pipedEventAdapter.expired()) {
+                        auto adapterPtr = Util::expectValidWeakPointer<PipedEventAdapter<GestureEvent>>(this->pipedEventAdapter);
+                        adapterPtr->accept(gestureEvent);
                     }
                     pointerState.position = event.position;
                 }

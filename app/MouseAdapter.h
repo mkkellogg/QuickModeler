@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QMouseEvent>
 #include <QtQuick/qquickwindow.h>
 #include <QtQuick/QQuickItem>
@@ -34,7 +36,7 @@ namespace Modeler {
         MouseAdapter();
 
         bool processEvent(QObject* obj, QEvent* event);
-        bool setPipedEventAdapter(const PipedEventAdapter<MouseEvent>* adapter);
+        bool setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<MouseEvent>> adapter);
 
     private:
         class MouseButtonStatus {
@@ -48,7 +50,7 @@ namespace Modeler {
         unsigned int pressedButtonMask = 0;
         static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
 
-        const PipedEventAdapter<MouseEvent>* pipedEventAdapter;
+        std::weak_ptr<PipedEventAdapter<MouseEvent>> pipedEventAdapter;
     };
 
 }

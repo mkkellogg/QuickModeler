@@ -46,7 +46,7 @@ namespace Modeler {
         if (type == AppWindowType::RenderSurface) {
             GestureAdapter* gestureAdapter = window->getGestureAdapter();
             if (gestureAdapter) {
-                gestureAdapter->setPipedEventAdapter(&pipedGestureAdapter);
+                gestureAdapter->setPipedEventAdapter(pipedGestureAdapter);
             }
 
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);

@@ -44,7 +44,6 @@ namespace Modeler  {
         bool initialized;
         qreal m_t;
         RendererGL renderer;
-
         MouseAdapter mouseAdapter;
         GestureAdapter gestureAdapter;
     };

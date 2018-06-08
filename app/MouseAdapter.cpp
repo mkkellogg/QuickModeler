@@ -1,14 +1,15 @@
 #include "MouseAdapter.h"
 #include "Settings.h"
+#include "Util.h"
 
 namespace Modeler {
 
-    MouseAdapter::MouseAdapter(): pipedEventAdapter(nullptr) {
+    MouseAdapter::MouseAdapter() {
 
     }
 
-    bool MouseAdapter::setPipedEventAdapter(const PipedEventAdapter<MouseEvent>* adapter) {
-        if(this->pipedEventAdapter == nullptr) {
+    bool MouseAdapter::setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<MouseEvent>> adapter) {
+        if(this->pipedEventAdapter.expired()) {
             this->pipedEventAdapter = adapter;
             return true;
         }
@@ -48,11 +49,12 @@ namespace Modeler {
                     break;
                 default: break;
             }
-            if (this->pipedEventAdapter) {
+            if (!this->pipedEventAdapter.expired()) {
                 MouseEvent event(mouseEventType);
                 event.buttons = pressedButtonMask;
                 event.position = mousePos;
-                this->pipedEventAdapter->accept(event);
+                auto adapterPtr = Util::expectValidWeakPointer<PipedEventAdapter<MouseEvent>>(this->pipedEventAdapter);
+                adapterPtr->accept(event);
             }
             return true;
         }
