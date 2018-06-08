@@ -101,6 +101,7 @@ namespace Modeler {
         enginePtr->setActiveScene(scene);
 
         Core::ValidWeakPointer<Core::Scene> scenePtr(scene);
+        Core::ValidWeakPointer<Core::Object3D> sceneRootPtr = Core::ValidWeakPointer<Core::Object3D>(scenePtr->getRoot());
 
         // ======= Setup Cube =================
         Core::Real cubeVertexPositions[] = {
@@ -163,7 +164,7 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> bigCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, bigCubeObj);
         bigCubeObj->addRenderable(bigCube);
         bigCubeObj->setRenderer(bigCubeRenderer);
-        scenePtr->getRoot()->addObject(bigCubeObj);
+        sceneRootPtr->addObject(bigCubeObj);
         bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
 
 
@@ -183,7 +184,7 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> smallCubeRenderer = std::make_shared<Core::MeshRenderer>(cubeMaterial, smallCubeObj);
         smallCubeObj->addRenderable(smallCube);
         smallCubeObj->setRenderer(smallCubeRenderer);
-        scenePtr->getRoot()->addObject(smallCubeObj);
+        sceneRootPtr->addObject(smallCubeObj);
         smallCubeObj->getTransform().getLocalMatrix().scale(Core::Vector3r(0.5f, 0.5f, 0.5f));
         smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
 
@@ -218,13 +219,13 @@ namespace Modeler {
         std::shared_ptr<Core::MeshRenderer> planeRenderer = std::make_shared<Core::MeshRenderer>(planeMaterial, planeObj);
         planeObj->addRenderable(planeMesh);
         planeObj->setRenderer(planeRenderer);
-        scenePtr->getRoot()->addObject(planeObj);
+        sceneRootPtr->addObject(planeObj);
 
 
 
         std::shared_ptr<Core::Camera> sharedRenderCamera = std::make_shared<Core::Camera>();
         this->renderCamera = sharedRenderCamera;
-        scenePtr->getRoot()->addObject(sharedRenderCamera);
+        sceneRootPtr->addObject(sharedRenderCamera);
 
         Core::Quaternion qA;
         qA.fromAngleAxis(0.0, 0, 1, 0);

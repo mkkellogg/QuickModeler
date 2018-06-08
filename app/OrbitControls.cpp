@@ -16,12 +16,10 @@ namespace Modeler {
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
 
         Core::ValidWeakPointer<Core::Engine> enginePtr(this->engine);
-
-        std::shared_ptr<Core::Renderer> renderer = enginePtr->getRenderer();
-
+        Core::ValidWeakPointer<Core::Renderer> rendererPtr(enginePtr->getRenderer());
         Core::ValidWeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
 
-        Core::Vector4u viewport = renderer->getViewport();
+        Core::Vector4u viewport = rendererPtr->getViewport();
         Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;
         Core::Real ndcStartY = (Core::Real)event.start.y / viewport.w * 2.0f - 1.0f;
         Core::Real ndcEndX = (Core::Real)event.end.x / viewport.z * 2.0f - 1.0f;

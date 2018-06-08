@@ -28,8 +28,7 @@ SOURCES += \
     $$PWD/GestureAdapter.cpp \
     $$PWD/Event.cpp \
     $$PWD/OrbitControls.cpp \
-    $$PWD/Settings.cpp \
-    $$PWD/Util.cpp
+    $$PWD/Settings.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc
