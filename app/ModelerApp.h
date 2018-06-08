@@ -40,7 +40,7 @@ namespace Modeler {
         OrbitControls* orbitControls;
         std::weak_ptr<Core::Camera> renderCamera;
         std::weak_ptr<Core::Engine> engine;
-        PipedEventAdapter<GestureAdapter::GestureEvent> pipedGestureAdapter;
+        std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
     };
 }
 

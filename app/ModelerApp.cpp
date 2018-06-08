@@ -26,8 +26,8 @@
 #include "Core/image/CubeTexture.h"
 
 namespace Modeler {
-    ModelerApp::ModelerApp(QQuickView* rootView):  engineReady(false), rootView(rootView), orbitControls(nullptr),
-        pipedGestureAdapter(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1)) {
+    ModelerApp::ModelerApp(QQuickView* rootView):  engineReady(false), rootView(rootView), orbitControls(nullptr) {
+        pipedGestureAdapter = std::make_shared<PipedEventAdapter<GestureAdapter::GestureEvent>>(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1));
         for (unsigned int i = 0; i < MaxWindows; i++) this->liveWindows[i] = nullptr;
     }
 
