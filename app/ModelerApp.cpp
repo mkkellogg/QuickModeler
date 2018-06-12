@@ -102,7 +102,7 @@ namespace Modeler {
         engine->setActiveScene(scene);
         Core::ValidWeakPointer<Core::Object3D> sceneRoot(scene->getRoot());
 
-        // ======= Setup Cube =================
+        // ======= cube data =================
         Core::Real cubeVertexPositions[] = {
             // back
             -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
@@ -148,7 +148,10 @@ namespace Modeler {
         Core::ValidWeakPointer<Core::BasicMaterial> cubeMaterial(engine->createMaterial<Core::BasicMaterial>());
         cubeMaterial->build();
 
-        Core::ValidWeakPointer<Core::Mesh> bigCube(engine->createMesh<Core::Mesh>(36, false));
+
+        // ======= big cube ===============
+        Core::ValidWeakPointer<Core::Mesh> bigCube(engine->createMesh(36, false));
+        bigCube->init();
         bigCube->enableAttribute(Core::StandardAttributes::Position);
         Core::Bool positionInited = bigCube->initVertexPositions(36);
         ASSERT(positionInited, "Unable to initialize big cube mesh vertex positions.");
@@ -166,7 +169,9 @@ namespace Modeler {
         bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
 
 
-        Core::ValidWeakPointer<Core::Mesh> smallCube(engine->createMesh<Core::Mesh>(36, false));
+        // ==== small cube ============
+        Core::ValidWeakPointer<Core::Mesh> smallCube(engine->createMesh(36, false));
+        smallCube->init();
         smallCube->enableAttribute(Core::StandardAttributes::Position);
         positionInited = smallCube->initVertexPositions(36);
         ASSERT(positionInited, "Unable to initialize small cube mesh vertex positions.");
@@ -177,7 +182,6 @@ namespace Modeler {
         ASSERT(colorInited, "Unable to initialize small cube mesh vertex colors.");
         smallCube->getVertexColors()->store(cubeVertexColors);
 
-
         Core::ValidWeakPointer<MeshContainer> smallCubeObj( engine->createObject3D<MeshContainer>());
         Core::ValidWeakPointer<Core::MeshRenderer> smallCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, smallCubeObj));
         smallCubeObj->addRenderable(smallCube);
@@ -186,10 +190,9 @@ namespace Modeler {
         smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
 
 
-
-        // ======= Setup Plane =================
-        Core::ValidWeakPointer<Core::Mesh> planeMesh(engine->createMesh<Core::Mesh>(6, false));
-
+        // ======= plane =================
+        Core::ValidWeakPointer<Core::Mesh> planeMesh(engine->createMesh(6, false));
+        planeMesh->init();
         Core::Real planeVertexPositions[] = {
             -7.0, 0.0, -7.0, 1.0, 7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0,
             7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0, 7.0, 0.0, 7.0, 1.0,
@@ -219,7 +222,7 @@ namespace Modeler {
         sceneRoot->addObject(planeObj);
 
 
-
+        // ====== initial camera setup ====================
         this->renderCamera = engine->createCamera();
         sceneRoot->addObject(this->renderCamera);
 

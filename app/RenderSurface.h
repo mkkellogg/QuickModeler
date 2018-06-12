@@ -3,12 +3,13 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickItem>
 
+#include "Core/Engine.h"
+
 #include "ModelerApp.h"
 #include "ModelerAppWindow.h"
 #include "RendererGL.h"
 #include "MouseAdapter.h"
 #include "GestureAdapter.h"
-#include "Core/Engine.h"
 
 namespace Modeler  {
 

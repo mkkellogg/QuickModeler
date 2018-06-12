@@ -5,6 +5,7 @@
 #include "Core/math/Matrix4x4.h"
 #include "Core/math/Quaternion.h"
 #include "Core/util/ValidWeakPointer.h"
+#include "Core/Graphics.h"
 
 #include "OrbitControls.h"
 
@@ -16,7 +17,8 @@ namespace Modeler {
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
 
         Core::ValidWeakPointer<Core::Engine> enginePtr(this->engine);
-        Core::ValidWeakPointer<Core::Renderer> rendererPtr(enginePtr->getRenderer());
+        Core::ValidWeakPointer<Core::Graphics> graphics(enginePtr->getGraphicsSystem());
+        Core::ValidWeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
         Core::ValidWeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
 
         Core::Vector4u viewport = rendererPtr->getViewport();
