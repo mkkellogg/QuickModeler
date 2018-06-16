@@ -24,7 +24,7 @@
 #include "Core/material/StandardAttributes.h"
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
-#include "Core/util/ValidWeakPointer.h"
+#include "Core/util/WeakPointer.h"
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
@@ -97,10 +97,11 @@ namespace Modeler {
     void ModelerApp::onEngineReady(std::weak_ptr<Core::Engine> wEngine) {
         this->engineReady = true;
 
-        Core::ValidWeakPointer<Core::Engine> engine(wEngine);
-        Core::ValidWeakPointer<Core::Scene> scene(engine->createScene());
+        Core::WeakPointer<Core::Engine> engine(wEngine);
+        Core::WeakPointer<Core::Scene> scene(engine->createScene());
         engine->setActiveScene(scene);
-        Core::ValidWeakPointer<Core::Object3D> sceneRoot(scene->getRoot());
+        Core::WeakPointer<Core::Object3D> sceneRoot(scene->getRoot());
+
 
         // ======= cube data =================
         Core::Real cubeVertexPositions[] = {
@@ -145,12 +146,12 @@ namespace Modeler {
             1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
         };
 
-        Core::ValidWeakPointer<Core::BasicMaterial> cubeMaterial(engine->createMaterial<Core::BasicMaterial>());
+        Core::WeakPointer<Core::BasicMaterial> cubeMaterial(engine->createMaterial<Core::BasicMaterial>());
         cubeMaterial->build();
 
 
         // ======= big cube ===============
-        Core::ValidWeakPointer<Core::Mesh> bigCube(engine->createMesh(36, false));
+        Core::WeakPointer<Core::Mesh> bigCube(engine->createMesh(36, false));
         bigCube->init();
         bigCube->enableAttribute(Core::StandardAttributes::Position);
         Core::Bool positionInited = bigCube->initVertexPositions(36);
@@ -162,15 +163,16 @@ namespace Modeler {
         ASSERT(colorInited, "Unable to initialize big cube mesh vertex colors.");
         bigCube->getVertexColors()->store(cubeVertexColors);
 
-        Core::ValidWeakPointer<MeshContainer> bigCubeObj(engine->createObject3D<MeshContainer>());
-        Core::ValidWeakPointer<Core::MeshRenderer> bigCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, bigCubeObj));
+        Core::WeakPointer<MeshContainer> bigCubeObj(engine->createObject3D<MeshContainer>());
+
+        Core::WeakPointer<Core::MeshRenderer> bigCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, bigCubeObj));
         bigCubeObj->addRenderable(bigCube);
-        sceneRoot->addObject(bigCubeObj);
+        sceneRoot->addChild(bigCubeObj);
         bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
 
 
         // ==== small cube ============
-        Core::ValidWeakPointer<Core::Mesh> smallCube(engine->createMesh(36, false));
+        Core::WeakPointer<Core::Mesh> smallCube(engine->createMesh(36, false));
         smallCube->init();
         smallCube->enableAttribute(Core::StandardAttributes::Position);
         positionInited = smallCube->initVertexPositions(36);
@@ -182,16 +184,16 @@ namespace Modeler {
         ASSERT(colorInited, "Unable to initialize small cube mesh vertex colors.");
         smallCube->getVertexColors()->store(cubeVertexColors);
 
-        Core::ValidWeakPointer<MeshContainer> smallCubeObj( engine->createObject3D<MeshContainer>());
-        Core::ValidWeakPointer<Core::MeshRenderer> smallCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, smallCubeObj));
+        Core::WeakPointer<MeshContainer> smallCubeObj( engine->createObject3D<MeshContainer>());
+        Core::WeakPointer<Core::MeshRenderer> smallCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, smallCubeObj));
         smallCubeObj->addRenderable(smallCube);
-        sceneRoot->addObject(smallCubeObj);
+        sceneRoot->addChild(smallCubeObj);
         smallCubeObj->getTransform().getLocalMatrix().scale(Core::Vector3r(0.5f, 0.5f, 0.5f));
         smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
 
 
         // ======= plane =================
-        Core::ValidWeakPointer<Core::Mesh> planeMesh(engine->createMesh(6, false));
+        Core::WeakPointer<Core::Mesh> planeMesh(engine->createMesh(6, false));
         planeMesh->init();
         Core::Real planeVertexPositions[] = {
             -7.0, 0.0, -7.0, 1.0, 7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0,
@@ -213,18 +215,19 @@ namespace Modeler {
         ASSERT(planeColorInited, "Unable to initialize plane mesh vertex colors.");
         planeMesh->getVertexColors()->store(planeVertexColors);
 
-        Core::ValidWeakPointer<Core::BasicMaterial> planeMaterial(engine->createMaterial<Core::BasicMaterial>());
+        Core::WeakPointer<Core::BasicMaterial> planeMaterial(engine->createMaterial<Core::BasicMaterial>());
         planeMaterial->build();
 
-        Core::ValidWeakPointer<MeshContainer> planeObj(engine->createObject3D<MeshContainer>());
+        Core::WeakPointer<MeshContainer> planeObj(engine->createObject3D<MeshContainer>());
         engine->createRenderer<Core::MeshRenderer>(planeMaterial, planeObj);
         planeObj->addRenderable(planeMesh);
-        sceneRoot->addObject(planeObj);
+        sceneRoot->addChild(planeObj);
 
 
         // ====== initial camera setup ====================
-        this->renderCamera = engine->createCamera();
-        sceneRoot->addObject(this->renderCamera);
+        std::weak_ptr<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
+        this->renderCamera = engine->createCamera(cameraObj);
+        sceneRoot->addChild(cameraObj);
 
         Core::Quaternion qA;
         qA.fromAngleAxis(0.0, 0, 1, 0);
@@ -236,10 +239,10 @@ namespace Modeler {
         worldMatrix.translate(12, 0, 0);
         worldMatrix.translate(0, 7, 0);
 
-        Core::ValidWeakPointer<Core::Camera> vRenderCamera(this->renderCamera);
-        vRenderCamera->getTransform().getLocalMatrix().copy(worldMatrix);
-        vRenderCamera->getTransform().updateWorldMatrix();
-        vRenderCamera->lookAt(Core::Point3r(0, 0, 0));
+        Core::WeakPointer<Core::Object3D> cameraObjPtr(cameraObj);
+        cameraObjPtr->getTransform().getLocalMatrix().copy(worldMatrix);
+        cameraObjPtr->getTransform().updateWorldMatrix();
+        cameraObjPtr->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
         this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
     }

@@ -4,7 +4,7 @@
 #include "Core/geometry/Vector3.h"
 #include "Core/math/Matrix4x4.h"
 #include "Core/math/Quaternion.h"
-#include "Core/util/ValidWeakPointer.h"
+#include "Core/util/WeakPointer.h"
 #include "Core/Graphics.h"
 
 #include "OrbitControls.h"
@@ -16,10 +16,10 @@ namespace Modeler {
 
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
 
-        Core::ValidWeakPointer<Core::Engine> enginePtr(this->engine);
-        Core::ValidWeakPointer<Core::Graphics> graphics(enginePtr->getGraphicsSystem());
-        Core::ValidWeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
-        Core::ValidWeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
+        Core::WeakPointer<Core::Engine> enginePtr(this->engine);
+        Core::WeakPointer<Core::Graphics> graphics(enginePtr->getGraphicsSystem());
+        Core::WeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
+        Core::WeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
 
         Core::Vector4u viewport = rendererPtr->getViewport();
         Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;
@@ -32,7 +32,9 @@ namespace Modeler {
         targetCameraPtr->unProject(viewStart);
         targetCameraPtr->unProject(viewEnd);
 
-        Core::Matrix4x4 viewMat = targetCameraPtr->getTransform().getWorldMatrix();
+        Core::WeakPointer<Core::Object3D> cameraObjPtr(targetCameraPtr->getOwner());
+
+        Core::Matrix4x4 viewMat = cameraObjPtr->getTransform().getWorldMatrix();
         viewMat.transform(viewStart, true);
         viewMat.transform(viewEnd, true);
 
@@ -45,7 +47,7 @@ namespace Modeler {
 
         Core::Point3r cameraPos;
         cameraPos.set(0, 0, 0);
-        targetCameraPtr->getTransform().transform(cameraPos, true);
+        cameraObjPtr->getTransform().transform(cameraPos, true);
         cameraPos.set(cameraPos.x - this->origin.x, cameraPos.y - this->origin.y, cameraPos.z - this->origin.z);
         Core::Real distanceFromOrigin = cameraPos.magnitude();
 
@@ -60,13 +62,13 @@ namespace Modeler {
             Core::Matrix4x4 rot = qA.rotationMatrix();
 
             Core::Vector3r orgVec(this->origin.x, this->origin.y, this->origin.z);
-            Core::Matrix4x4& localMatrix = targetCameraPtr->getTransform().getLocalMatrix();
+            Core::Matrix4x4& localMatrix = cameraObjPtr->getTransform().getLocalMatrix();
             orgVec.invert();
             localMatrix.preTranslate(orgVec);
             localMatrix.preMultiply(rot);
             orgVec.invert();
             localMatrix.preTranslate(orgVec);
-            targetCameraPtr->lookAt(this->origin);
+            cameraObjPtr->getTransform().lookAt(this->origin);
 
         }
         else if (event.pointer == GesturePointer::Tertiary) {
@@ -75,7 +77,7 @@ namespace Modeler {
             viewDragVector.invert();
             viewDragVector = viewDragVector * translationScaleFactor;
             this->origin = this->origin + viewDragVector;
-            targetCameraPtr->getTransform().getLocalMatrix().preTranslate(viewDragVector);
+            cameraObjPtr->getTransform().getLocalMatrix().preTranslate(viewDragVector);
         }
 
     }

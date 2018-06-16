@@ -1,6 +1,6 @@
 #include <functional>
 
-#include "Core/util/ValidWeakPointer.h"
+#include "Core/util/WeakPointer.h"
 
 #include "GestureAdapter.h"
 #include "Util.h"
@@ -47,7 +47,7 @@ namespace Modeler {
                     gestureEvent.end =  event.position;
                     gestureEvent.pointer = (GesturePointer)pointerIndex;
                     if (!this->pipedEventAdapter.expired()) {
-                        Core::ValidWeakPointer<PipedEventAdapter<GestureEvent>> adapterPtr(this->pipedEventAdapter);
+                        Core::WeakPointer<PipedEventAdapter<GestureEvent>> adapterPtr(this->pipedEventAdapter);
                         adapterPtr->accept(gestureEvent);
                     }
                     pointerState.position = event.position;
