@@ -10,16 +10,14 @@
 #include "OrbitControls.h"
 
 namespace Modeler {
-    OrbitControls::OrbitControls(std::weak_ptr<Core::Engine> engine, std::weak_ptr<Core::Camera> targetCamera): engine(engine), targetCamera(targetCamera) {
+    OrbitControls::OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera): engine(engine), targetCamera(targetCamera) {
 
     }
 
     void OrbitControls::handleGesture(GestureAdapter::GestureEvent event) {
 
-        Core::WeakPointer<Core::Engine> enginePtr(this->engine);
-        Core::WeakPointer<Core::Graphics> graphics(enginePtr->getGraphicsSystem());
+        Core::WeakPointer<Core::Graphics> graphics(this->engine->getGraphicsSystem());
         Core::WeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
-        Core::WeakPointer<Core::Camera> targetCameraPtr(this->targetCamera);
 
         Core::Vector4u viewport = rendererPtr->getViewport();
         Core::Real ndcStartX = (Core::Real)event.start.x / viewport.z * 2.0f - 1.0f;
@@ -29,10 +27,10 @@ namespace Modeler {
 
         Core::Vector3r viewStart(ndcStartX, ndcEndY, 0.0f);
         Core::Vector3r viewEnd(ndcEndX, ndcStartY, 0.0f);
-        targetCameraPtr->unProject(viewStart);
-        targetCameraPtr->unProject(viewEnd);
+        this->targetCamera->unProject(viewStart);
+        this->targetCamera->unProject(viewEnd);
 
-        Core::WeakPointer<Core::Object3D> cameraObjPtr(targetCameraPtr->getOwner());
+        Core::WeakPointer<Core::Object3D> cameraObjPtr(this->targetCamera->getOwner());
 
         Core::Matrix4x4 viewMat = cameraObjPtr->getTransform().getWorldMatrix();
         viewMat.transform(viewStart, true);

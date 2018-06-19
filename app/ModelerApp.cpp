@@ -94,10 +94,9 @@ namespace Modeler {
         }
     }
 
-    void ModelerApp::onEngineReady(std::weak_ptr<Core::Engine> wEngine) {
+    void ModelerApp::onEngineReady(Core::WeakPointer<Core::Engine> engine) {
         this->engineReady = true;
 
-        Core::WeakPointer<Core::Engine> engine(wEngine);
         Core::WeakPointer<Core::Scene> scene(engine->createScene());
         engine->setActiveScene(scene);
         Core::WeakPointer<Core::Object3D> sceneRoot(scene->getRoot());
@@ -225,7 +224,7 @@ namespace Modeler {
 
 
         // ====== initial camera setup ====================
-        std::weak_ptr<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
+        Core::WeakPointer<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
         this->renderCamera = engine->createCamera(cameraObj);
         sceneRoot->addChild(cameraObj);
 

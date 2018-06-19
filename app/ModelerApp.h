@@ -32,14 +32,14 @@ namespace Modeler {
     private:
 
         void onGesture(GestureAdapter::GestureEvent event);
-        void onEngineReady(std::weak_ptr<Core::Engine> engine);
+        void onEngineReady(Core::WeakPointer<Core::Engine> engine);
 
         bool engineReady;
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
         OrbitControls* orbitControls;
-        std::weak_ptr<Core::Camera> renderCamera;
-        std::weak_ptr<Core::Engine> engine;
+        Core::WeakPointer<Core::Camera> renderCamera;
+        Core::WeakPointer<Core::Engine> engine;
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
     };
 }

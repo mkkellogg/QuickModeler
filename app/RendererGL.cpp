@@ -23,7 +23,7 @@ namespace Modeler {
         render();
     }
 
-    std::weak_ptr<Core::Engine> RendererGL::getEngine() {
+    Core::WeakPointer<Core::Engine> RendererGL::getEngine() {
         return engine;
     }
 

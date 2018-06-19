@@ -10,8 +10,8 @@ namespace Modeler {
 
     }
 
-    bool MouseAdapter::setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<MouseEvent>> adapter) {
-        if(this->pipedEventAdapter.expired()) {
+    bool MouseAdapter::setPipedEventAdapter(Core::WeakPointer<PipedEventAdapter<MouseEvent>> adapter) {
+        if(!this->pipedEventAdapter) {
             this->pipedEventAdapter = adapter;
             return true;
         }
@@ -51,7 +51,7 @@ namespace Modeler {
                     break;
                 default: break;
             }
-            if (!this->pipedEventAdapter.expired()) {
+            if (this->pipedEventAdapter) {
                 MouseEvent event(mouseEventType);
                 event.buttons = pressedButtonMask;
                 event.position = mousePos;

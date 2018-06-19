@@ -34,7 +34,7 @@ namespace Modeler {
         GestureAdapter();
 
         void setMouseAdapter(MouseAdapter& mouseAdapter);
-        bool setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<GestureEvent>> adapter);
+        bool setPipedEventAdapter(Core::WeakPointer<PipedEventAdapter<GestureEvent>> adapter);
 
     private:
         static const unsigned int MAX_POINTERS = 5;
@@ -51,6 +51,6 @@ namespace Modeler {
         std::shared_ptr<PipedEventAdapter<MouseAdapter::MouseEvent>> mouseEventAdapter;
         PointerState pointerStates[MAX_POINTERS];
 
-        std::weak_ptr<PipedEventAdapter<GestureEvent>> pipedEventAdapter;
+        Core::WeakPointer<PipedEventAdapter<GestureEvent>> pipedEventAdapter;
     };
 }

@@ -9,6 +9,7 @@
 #include "PipedEventAdapter.h"
 
 #include "Core/geometry/Vector2.h"
+#include "Core/util/WeakPointer.h"
 
 namespace Modeler {
 
@@ -36,7 +37,7 @@ namespace Modeler {
         MouseAdapter();
 
         bool processEvent(QObject* obj, QEvent* event);
-        bool setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<MouseEvent>> adapter);
+        bool setPipedEventAdapter(Core::WeakPointer<PipedEventAdapter<MouseEvent>> adapter);
 
     private:
         class MouseButtonStatus {
@@ -50,7 +51,7 @@ namespace Modeler {
         unsigned int pressedButtonMask = 0;
         static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
 
-        std::weak_ptr<PipedEventAdapter<MouseEvent>> pipedEventAdapter;
+         Core::WeakPointer<PipedEventAdapter<MouseEvent>> pipedEventAdapter;
     };
 
 }

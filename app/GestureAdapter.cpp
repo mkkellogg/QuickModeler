@@ -14,8 +14,8 @@ namespace Modeler {
         mouseAdapter.setPipedEventAdapter(this->mouseEventAdapter);
     }
 
-    bool GestureAdapter::setPipedEventAdapter(std::weak_ptr<PipedEventAdapter<GestureEvent>> adapter) {
-        if(this->pipedEventAdapter.expired()) {
+    bool GestureAdapter::setPipedEventAdapter(Core::WeakPointer<PipedEventAdapter<GestureEvent>> adapter) {
+        if(!this->pipedEventAdapter) {
             this->pipedEventAdapter = adapter;
             return true;
         }
@@ -46,9 +46,8 @@ namespace Modeler {
                     gestureEvent.start = pointerState.position;
                     gestureEvent.end =  event.position;
                     gestureEvent.pointer = (GesturePointer)pointerIndex;
-                    if (!this->pipedEventAdapter.expired()) {
-                        Core::WeakPointer<PipedEventAdapter<GestureEvent>> adapterPtr(this->pipedEventAdapter);
-                        adapterPtr->accept(gestureEvent);
+                    if (this->pipedEventAdapter) {
+                        this->pipedEventAdapter->accept(gestureEvent);
                     }
                     pointerState.position = event.position;
                 }

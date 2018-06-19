@@ -9,13 +9,13 @@ namespace Modeler {
 
     class OrbitControls {
     public:
-        OrbitControls(std::weak_ptr<Core::Engine> engine, std::weak_ptr<Core::Camera> targetCamera);
+        OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera);
         void handleGesture(GestureAdapter::GestureEvent event);
 
     private:
         Core::Point3r origin;
-        std::weak_ptr<Core::Engine> engine;
-        std::weak_ptr<Core::Camera> targetCamera;
+        Core::WeakPointer<Core::Engine> engine;
+        Core::WeakPointer<Core::Camera> targetCamera;
     };
 
 }
