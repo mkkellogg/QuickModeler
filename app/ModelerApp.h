@@ -5,6 +5,8 @@
 
 #include <QGuiApplication>
 #include <QtQuick/QQuickView>
+#include <QObject>
+#include <QString>
 
 #include "ModelerAppWindow.h"
 #include "GestureAdapter.h"
@@ -15,7 +17,10 @@
 
 namespace Modeler {
 
-    class ModelerApp {
+    class ModelerApp: public QObject {
+
+        Q_OBJECT
+
     public:
 
         const static int MaxWindows = 32;
@@ -25,7 +30,8 @@ namespace Modeler {
             RenderSurface = 1,
         };
 
-        ModelerApp(QQuickView* rootView);
+        ModelerApp(QObject *parent = 0) : QObject(parent), engineReady(false),  orbitControls(nullptr) {}
+        void initialize(QQuickView* rootView);
         bool addLoadedWindow(ModelerAppWindow* window, AppWindowType type);
         bool addLoadedWindow(const std::string& windowName, AppWindowType type);
 
@@ -41,6 +47,10 @@ namespace Modeler {
         Core::WeakPointer<Core::Camera> renderCamera;
         Core::WeakPointer<Core::Engine> engine;
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
+        Core::WeakPointer<Core::Object3D> sceneRoot;
+
+    public slots:
+        void loadModel(const QString& path);
     };
 }
 

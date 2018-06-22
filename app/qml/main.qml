@@ -1,10 +1,28 @@
 import QtQuick 2.0
 import RenderSurface 1.0
+import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.3
+import QtQuick.Dialogs 1.3
 
 Item {
 
     width: 1200
     height: 800
+
+    FileDialog {
+        id: modelChooserDialog
+        title: "Please choose a file"
+        folder: shortcuts.home
+        onAccepted: {
+            topMenu.modelPathText = modelChooserDialog.fileUrls[0] //fileDialog.fileUrls
+            Qt.quit()
+        }
+        onRejected: {
+            Qt.quit()
+        }
+       // Component.onCompleted: visible = true
+        visible: false
+    }
 
 
     Rectangle {
@@ -17,6 +35,31 @@ Item {
         y: 0
         height: 60
         width: parent.width
+        property alias modelPathText: modelNameText.text
+
+        RowLayout {
+            x: 5
+            y: 5
+            TextField {
+                Layout.preferredWidth: 400
+                id: modelNameText
+                placeholderText: qsTr("Enter filename...")
+            }
+
+            Button {
+                text: "Browse for file"
+                onClicked: {
+                    modelChooserDialog.visible = true
+                }
+            }
+
+            Button {
+                text: "Load"
+                onClicked: {
+                    _modelerApp.loadModel(modelNameText.text);
+                }
+            }
+        }
     }
 
     Rectangle {
