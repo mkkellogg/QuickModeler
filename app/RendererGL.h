@@ -16,6 +16,7 @@ namespace Modeler {
         Q_OBJECT
     public:
         typedef std::function<void(RendererGL*)> OnInitCallback;
+        typedef std::function<void(RendererGL*)> OnPreRenderCallback;
 
         RendererGL();
         ~RendererGL();
@@ -29,6 +30,7 @@ namespace Modeler {
 
         Core::WeakPointer<Core::Engine> getEngine();
         void onInit(OnInitCallback func);
+        void onPreRender(OnPreRenderCallback func);
         bool isEngineInitialized();
 
     public slots:
@@ -44,6 +46,7 @@ namespace Modeler {
         std::shared_ptr<Core::Engine> engine;
 
         std::vector<OnInitCallback> onInits;
+        std::vector<OnPreRenderCallback> onPreRenders;
 
         void init();
         void update();
@@ -52,5 +55,8 @@ namespace Modeler {
 
         void resolveOnInits();
         void resolveOnInit(OnInitCallback callback);
+
+        void resolveOnPreRenders();
+        void resolveOnPreRender(OnPreRenderCallback callback);
     };
 }

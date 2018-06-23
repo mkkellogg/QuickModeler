@@ -4,7 +4,6 @@
 #include <QtQuick/QQuickView>
 
 #include "ModelerApp.h"
-#include "ModelerAppView.h"
 #include "RenderSurface.h"
 #include "Util.h"
 
@@ -87,7 +86,6 @@ namespace Modeler {
 
     void ModelerApp::loadModel(const QString& path) {
         std::string sPath = path.toStdString();
-        std::cerr << sPath << std::endl;
 
         std::string filePrefix("file://");
         std::string pathPrefix = sPath.substr(0, 7) ;
@@ -95,13 +93,19 @@ namespace Modeler {
             sPath = sPath.substr(7);
         }
 
-        std::cerr << pathPrefix << std::endl;
-        std::cerr << sPath << std::endl;
-
-        Core::ModelLoader& modelLoader = engine->getModelLoader();
-        Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
-        //mushroom->getTransform().getLocalMatrix().rotate(1.0f, 0.0f, 0.0f, -90.0f);
-        this->sceneRoot->addChild(object);
+        ModelerAppWindow* renderSurfaceWindow = this->liveWindows[(unsigned int)AppWindowType::RenderSurface];
+        if (renderSurfaceWindow) {
+            RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(renderSurfaceWindow);
+            if (renderSurface) {
+                RendererGL* rendererGL = renderSurface->getRenderer();
+                RendererGL::OnPreRenderCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
+                    Core::ModelLoader& modelLoader = engine->getModelLoader();
+                    Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
+                    this->sceneRoot->addChild(object);
+                };
+                rendererGL->onPreRender(preRenderCallback);
+            }
+        }
     }
 
     void ModelerApp::onGesture(GestureAdapter::GestureEvent event) {
@@ -267,8 +271,8 @@ namespace Modeler {
 
         this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
 
-       // Core::ModelLoader& modelLoader = engine->getModelLoader();
-       // Core::WeakPointer<Core::Object3D> mushroom = modelLoader.loadModel("/home/mark/Development/Qt/resources/models/toon-level/mushroom/MushRoom_01.fbx", .05f, false, false, true);
+        //Core::ModelLoader& modelLoader = engine->getModelLoader();
+        //Core::WeakPointer<Core::Object3D> mushroom = modelLoader.loadModel("/home/mark/Development/Qt/resources/models/toon-level/mushroom/MushRoom_01.fbx", .05f, false, false, true);
         //mushroom->getTransform().getLocalMatrix().rotate(1.0f, 0.0f, 0.0f, -90.0f);
         //sceneRoot->addChild(mushroom);
     }

@@ -43,6 +43,7 @@ Item {
             TextField {
                 Layout.preferredWidth: 400
                 id: modelNameText
+                text: "file:///home/mark/Development/Qt/resources/models/toon-level/mushroom/MushRoom_01.fbx"
                 placeholderText: qsTr("Enter filename...")
             }
 

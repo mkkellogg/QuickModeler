@@ -20,6 +20,7 @@ namespace Modeler {
             initialized = true;
         }
         update();
+        this->resolveOnPreRenders();
         render();
     }
 
@@ -45,6 +46,10 @@ namespace Modeler {
         }
     }
 
+    void RendererGL::onPreRender(OnPreRenderCallback func) {
+        onPreRenders.push_back(func);
+    }
+
     void RendererGL::resolveOnInits() {
         for(std::vector<OnInitCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
             OnInitCallback func = *itr;
@@ -53,6 +58,20 @@ namespace Modeler {
     }
 
     void RendererGL::resolveOnInit(OnInitCallback callback) {
+        callback(this);
+    }
+
+    void RendererGL::resolveOnPreRenders() {
+        if (onPreRenders.size() > 0) {
+            for(std::vector<OnPreRenderCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
+                OnPreRenderCallback func = *itr;
+                resolveOnPreRender(func);
+            }
+            onPreRenders.clear();
+        }
+    }
+
+    void RendererGL::resolveOnPreRender(OnPreRenderCallback callback) {
         callback(this);
     }
 
