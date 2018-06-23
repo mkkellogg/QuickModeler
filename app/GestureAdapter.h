@@ -11,6 +11,7 @@ namespace Modeler {
 
         enum class GestureEventType {
             Drag = 0,
+            Scroll = 1,
         };
 
         enum class GesturePointer {
@@ -27,6 +28,7 @@ namespace Modeler {
             GesturePointer pointer;
             Core::Vector2i start;
             Core::Vector2i end;
+            Core::Real scrollDistance;
         private:
             GestureEventType type;
         };

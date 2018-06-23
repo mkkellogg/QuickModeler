@@ -29,7 +29,7 @@ namespace Modeler {
 
             const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>( event );
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
-            //printf("button: %d, %d, %d\n", buttonIndex, mouseEvent->button(), mouseEvent->buttons());
+            //std::cerr << buttonIndex << ", " << mouseEvent->button() << ", " << mouseEvent->buttons() << std::endl;
 
             QPoint qMousePos = mouseEvent->pos();
             Core::Vector2i mousePos(qMousePos.x(), qMousePos.y());
@@ -59,6 +59,19 @@ namespace Modeler {
                 adapterPtr->accept(event);
             }
             return true;
+        }
+        else if (eventType == QEvent::Wheel ) {
+
+             const QWheelEvent* const wheelEvent = static_cast<const QWheelEvent*>( event );
+             if (this->pipedEventAdapter) {
+                 MouseEvent event(MouseEventType::WheelScrolled);
+                 QPoint pDelta = wheelEvent->angleDelta();
+
+                 event.scrollDelta = (Core::Real)wheelEvent->delta() / 240.0f;
+                 event.buttons = 0;
+                 Core::WeakPointer<PipedEventAdapter<MouseEvent>> adapterPtr(this->pipedEventAdapter);
+                 adapterPtr->accept(event);
+             }
         }
 
          return false;

@@ -37,7 +37,7 @@ namespace Modeler {
         resolveOnInits();
     }
 
-    void RendererGL::onInit(OnInitCallback func) {
+    void RendererGL::onInit(LifeCycleEventCallback func) {
         if (engineInitialized) {
             resolveOnInit(func);
         }
@@ -46,32 +46,32 @@ namespace Modeler {
         }
     }
 
-    void RendererGL::onPreRender(OnPreRenderCallback func) {
+    void RendererGL::onPreRender(LifeCycleEventCallback func) {
         onPreRenders.push_back(func);
     }
 
     void RendererGL::resolveOnInits() {
-        for(std::vector<OnInitCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
-            OnInitCallback func = *itr;
+        for(std::vector<LifeCycleEventCallback>::iterator itr = onInits.begin(); itr != onInits.end(); ++itr) {
+            LifeCycleEventCallback func = *itr;
             resolveOnInit(func);
         }
     }
 
-    void RendererGL::resolveOnInit(OnInitCallback callback) {
+    void RendererGL::resolveOnInit(LifeCycleEventCallback callback) {
         callback(this);
     }
 
     void RendererGL::resolveOnPreRenders() {
         if (onPreRenders.size() > 0) {
-            for(std::vector<OnPreRenderCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
-                OnPreRenderCallback func = *itr;
+            for(std::vector<LifeCycleEventCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
+                LifeCycleEventCallback func = *itr;
                 resolveOnPreRender(func);
             }
             onPreRenders.clear();
         }
     }
 
-    void RendererGL::resolveOnPreRender(OnPreRenderCallback callback) {
+    void RendererGL::resolveOnPreRender(LifeCycleEventCallback callback) {
         callback(this);
     }
 

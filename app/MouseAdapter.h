@@ -21,6 +21,7 @@ namespace Modeler {
             ButtonUp = 1,
             ButtonClicked = 2,
             MouseMoved = 3,
+            WheelScrolled = 4
         };
 
         class MouseEvent {
@@ -29,6 +30,7 @@ namespace Modeler {
             MouseEventType getType() {return  type;}
             unsigned int buttons;
             Core::Vector2i position;
+            Core::Real scrollDelta;
         private:
             MouseEventType type;
         };

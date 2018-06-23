@@ -15,8 +15,7 @@ namespace Modeler {
     class RendererGL : public QObject, protected QOpenGLFunctions {
         Q_OBJECT
     public:
-        typedef std::function<void(RendererGL*)> OnInitCallback;
-        typedef std::function<void(RendererGL*)> OnPreRenderCallback;
+        typedef std::function<void(RendererGL*)> LifeCycleEventCallback;
 
         RendererGL();
         ~RendererGL();
@@ -29,8 +28,8 @@ namespace Modeler {
         void setWindow(QQuickWindow *window);
 
         Core::WeakPointer<Core::Engine> getEngine();
-        void onInit(OnInitCallback func);
-        void onPreRender(OnPreRenderCallback func);
+        void onInit(LifeCycleEventCallback func);
+        void onPreRender(LifeCycleEventCallback func);
         bool isEngineInitialized();
 
     public slots:
@@ -45,8 +44,8 @@ namespace Modeler {
         bool engineWindowSizeSet;
         std::shared_ptr<Core::Engine> engine;
 
-        std::vector<OnInitCallback> onInits;
-        std::vector<OnPreRenderCallback> onPreRenders;
+        std::vector<LifeCycleEventCallback> onInits;
+        std::vector<LifeCycleEventCallback> onPreRenders;
 
         void init();
         void update();
@@ -54,9 +53,9 @@ namespace Modeler {
         void testDraw();
 
         void resolveOnInits();
-        void resolveOnInit(OnInitCallback callback);
+        void resolveOnInit(LifeCycleEventCallback callback);
 
         void resolveOnPreRenders();
-        void resolveOnPreRender(OnPreRenderCallback callback);
+        void resolveOnPreRender(LifeCycleEventCallback callback);
     };
 }

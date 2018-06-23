@@ -57,7 +57,7 @@ namespace Modeler {
 
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
             if (renderSurface) {
-                RendererGL::OnInitCallback initer = [this](RendererGL* renderer) {
+                RendererGL::LifeCycleEventCallback initer = [this](RendererGL* renderer) {
                     this->engine = renderer->getEngine();
                     this->onEngineReady(engine);
                 };
@@ -98,7 +98,7 @@ namespace Modeler {
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(renderSurfaceWindow);
             if (renderSurface) {
                 RendererGL* rendererGL = renderSurface->getRenderer();
-                RendererGL::OnPreRenderCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
+                RendererGL::LifeCycleEventCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
                     Core::ModelLoader& modelLoader = engine->getModelLoader();
                     Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                     this->sceneRoot->addChild(object);
@@ -113,9 +113,8 @@ namespace Modeler {
             GestureAdapter::GestureEventType eventType = event.getType();
             switch(eventType) {
                 case GestureAdapter::GestureEventType::Drag:
-                {
+                case GestureAdapter::GestureEventType::Scroll:
                     this->orbitControls->handleGesture((event));
-                }
                 break;
             }
         }

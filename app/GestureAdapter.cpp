@@ -52,6 +52,13 @@ namespace Modeler {
                     pointerState.position = event.position;
                 }
             break;
+            case MouseAdapter::MouseEventType::WheelScrolled:
+                GestureEvent gestureEvent(GestureEventType::Scroll);
+                gestureEvent.scrollDistance = event.scrollDelta;
+                if (this->pipedEventAdapter) {
+                    this->pipedEventAdapter->accept(gestureEvent);
+                }
+            break;
         }
     }
 }
