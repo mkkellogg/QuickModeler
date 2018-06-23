@@ -6,6 +6,7 @@
 #include "Core/math/Quaternion.h"
 #include "Core/util/WeakPointer.h"
 #include "Core/Graphics.h"
+#include "Core/render/Camera.h"
 
 #include "OrbitControls.h"
 
@@ -52,6 +53,21 @@ namespace Modeler {
             viewStart = Core::Point3r(viewStart.x, viewStart.y, viewStart.z) - this->origin;
             viewEnd = Core::Point3r(viewEnd.x, viewEnd.y, viewEnd.z) - this->origin;
 
+            Core::Vector3r viewStartN = Core::Vector3r(viewStart.x, viewStart.y, viewStart.z);
+            viewStartN.normalize();
+
+            Core::Vector3r viewEndN = Core::Vector3r(viewEnd.x, viewEnd.y, viewEnd.z);
+            viewEndN.normalize();
+
+            Core::Real dot = Core::Vector3r::dot(viewStartN, viewEndN);
+             Core::Real angle = 0.0f;
+            if (dot < 1.0f && dot > -1.0f) {
+                angle = Core::Math::ACos(dot);
+            }
+            else if (dot <= -1.0f) {
+                angle = 180.0f;
+            }
+
             Core::Vector3r rotAxis;
             Core::Vector3r::cross(viewEnd, viewStart, rotAxis);
             rotAxis.normalize();
@@ -65,11 +81,9 @@ namespace Modeler {
             using GesturePointer = GestureAdapter::GesturePointer;
             if (event.pointer == GesturePointer::Secondary) {
 
-                Core::Real rotationScaleFactor = distanceFromOrigin * 0.1f;
-                Core::Vector3r ndcDrag(ndcEndX - ndcStartX, ndcEndY - ndcStartY, 0.0f);
-                float ndcDragLen = ndcDrag.magnitude();
+                Core::Real rotationScaleFactor = Core::Math::Max(distanceFromOrigin, 1.0f);
                 Core::Quaternion qA;
-                qA.fromAngleAxis(ndcDragLen * rotationScaleFactor, rotAxis);
+                qA.fromAngleAxis(angle * rotationScaleFactor, rotAxis);
                 Core::Matrix4x4 rot = qA.rotationMatrix();
 
                 Core::Vector3r orgVec(this->origin.x, this->origin.y, this->origin.z);

@@ -269,10 +269,5 @@ namespace Modeler {
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
         this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
-
-        //Core::ModelLoader& modelLoader = engine->getModelLoader();
-        //Core::WeakPointer<Core::Object3D> mushroom = modelLoader.loadModel("/home/mark/Development/Qt/resources/models/toon-level/mushroom/MushRoom_01.fbx", .05f, false, false, true);
-        //mushroom->getTransform().getLocalMatrix().rotate(1.0f, 0.0f, 0.0f, -90.0f);
-        //sceneRoot->addChild(mushroom);
     }
 }
