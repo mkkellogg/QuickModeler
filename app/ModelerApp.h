@@ -24,8 +24,6 @@ namespace Modeler {
 
     public:
 
-
-
         const static int MaxWindows = 32;
 
         enum class AppWindowType {
@@ -52,7 +50,7 @@ namespace Modeler {
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
         Core::WeakPointer<Core::Object3D> sceneRoot;
         RenderSurface* renderSurface;
-        CoreSync* coreSync;
+        std::shared_ptr<CoreSync> coreSync;
 
     public slots:
         void loadModel(const QString& path);

@@ -11,7 +11,7 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    OrbitControls::OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera, CoreSync* coreSync):
+    OrbitControls::OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera, Core::WeakPointer<CoreSync> coreSync):
         engine(engine), targetCamera(targetCamera), coreSync(coreSync) {
 
     }

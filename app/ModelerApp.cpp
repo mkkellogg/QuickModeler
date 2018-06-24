@@ -61,10 +61,11 @@ namespace Modeler {
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
             if (renderSurface) {
                 this->renderSurface = renderSurface;
-                this->coreSync = new CoreSync(renderSurface);
                 RendererGL::LifeCycleEventCallback initer = [this](RendererGL* renderer) {
                     this->engine = renderer->getEngine();
+                    this->coreSync = std::make_shared<CoreSync>(this->renderSurface);
                     this->onEngineReady(engine);
+                    this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->coreSync);
                 };
                 renderSurface->getRenderer().onInit(initer);
             }
@@ -90,22 +91,20 @@ namespace Modeler {
     }
 
     void ModelerApp::loadModel(const QString& path) {
-        std::string sPath = path.toStdString();
+        if (this->engineReady) {
+            std::string sPath = path.toStdString();
+            std::string filePrefix("file://");
+            std::string pathPrefix = sPath.substr(0, 7) ;
+            if (pathPrefix == filePrefix) {
+                sPath = sPath.substr(7);
+            }
 
-        std::string filePrefix("file://");
-        std::string pathPrefix = sPath.substr(0, 7) ;
-        if (pathPrefix == filePrefix) {
-            sPath = sPath.substr(7);
-        }
-
-        if (this->renderSurface) {
-            RendererGL& rendererGL = renderSurface->getRenderer();
-            RendererGL::LifeCycleEventCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
+            CoreSync::Runnable runnable = [this, sPath](Core::WeakPointer<Core::Engine> engine) {
                 Core::ModelLoader& modelLoader = engine->getModelLoader();
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
             };
-            rendererGL.onPreRender(preRenderCallback);
+            this->coreSync->run(runnable);
         }
     }
 
@@ -128,128 +127,6 @@ namespace Modeler {
         engine->setActiveScene(scene);
         this->sceneRoot = scene->getRoot();
 
-
-        // ======= cube data =================
-        Core::Real cubeVertexPositions[] = {
-            // back
-            -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
-            -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
-            // left
-            -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0,
-            -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0,
-            // right
-            1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
-            1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            // top
-            -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            // bottom
-            -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-            -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0,
-            // front
-            1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0
-        };
-
-        Core::Real cubeVertexColors[] = {
-            // back
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            // left
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            // right
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            // top
-            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-            // bottom
-            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-            1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0,
-            // front
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
-        };
-
-        Core::WeakPointer<Core::BasicMaterial> cubeMaterial(engine->createMaterial<Core::BasicMaterial>());
-        cubeMaterial->build();
-
-
-        // ======= big cube ===============
-        Core::WeakPointer<Core::Mesh> bigCube(engine->createMesh(36, false));
-        bigCube->init();
-        bigCube->enableAttribute(Core::StandardAttribute::Position);
-        Core::Bool positionInited = bigCube->initVertexPositions();
-        ASSERT(positionInited, "Unable to initialize big cube mesh vertex positions.");
-        bigCube->getVertexPositions()->store(cubeVertexPositions);
-
-        bigCube->enableAttribute(Core::StandardAttribute::Color);
-        Core::Bool colorInited = bigCube->initVertexColors();
-        ASSERT(colorInited, "Unable to initialize big cube mesh vertex colors.");
-        bigCube->getVertexColors()->store(cubeVertexColors);
-
-        Core::WeakPointer<MeshContainer> bigCubeObj(engine->createObject3D<MeshContainer>());
-
-        Core::WeakPointer<Core::MeshRenderer> bigCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, bigCubeObj));
-        bigCubeObj->addRenderable(bigCube);
-       // sceneRoot->addChild(bigCubeObj);
-        bigCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 1.01f, 0.0f));
-
-
-        // ==== small cube ============
-        Core::WeakPointer<Core::Mesh> smallCube(engine->createMesh(36, false));
-        smallCube->init();
-        smallCube->enableAttribute(Core::StandardAttribute::Position);
-        positionInited = smallCube->initVertexPositions();
-        ASSERT(positionInited, "Unable to initialize small cube mesh vertex positions.");
-        smallCube->getVertexPositions()->store(cubeVertexPositions);
-
-        smallCube->enableAttribute(Core::StandardAttribute::Color);
-        colorInited = smallCube->initVertexColors();
-        ASSERT(colorInited, "Unable to initialize small cube mesh vertex colors.");
-        smallCube->getVertexColors()->store(cubeVertexColors);
-
-        Core::WeakPointer<MeshContainer> smallCubeObj( engine->createObject3D<MeshContainer>());
-        Core::WeakPointer<Core::MeshRenderer> smallCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, smallCubeObj));
-        smallCubeObj->addRenderable(smallCube);
-       // sceneRoot->addChild(smallCubeObj);
-        smallCubeObj->getTransform().getLocalMatrix().scale(Core::Vector3r(0.5f, 0.5f, 0.5f));
-        smallCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(5.0f, 0.52f, 0.0f));
-
-
-        // ======= plane =================
-        Core::WeakPointer<Core::Mesh> planeMesh(engine->createMesh(6, false));
-        planeMesh->init();
-        Core::Real planeVertexPositions[] = {
-            -7.0, 0.0, -7.0, 1.0, 7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0,
-            7.0, 0.0, -7.0, 1.0, -7.0, 0.0, 7.0, 1.0, 7.0, 0.0, 7.0, 1.0,
-        };
-
-        planeMesh->enableAttribute(Core::StandardAttribute::Position);
-        Core::Bool planePositionInited = planeMesh->initVertexPositions();
-        ASSERT(planePositionInited, "Unable to initialize plane mesh vertex positions.");
-        planeMesh->getVertexPositions()->store(planeVertexPositions);
-
-        Core::Real planeVertexColors[] = {
-            0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f,
-            0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f, 0.65f, 0.65f, 0.65f, 1.0f,
-        };
-
-        planeMesh->enableAttribute(Core::StandardAttribute::Color);
-        Core::Bool planeColorInited = planeMesh->initVertexColors();
-        ASSERT(planeColorInited, "Unable to initialize plane mesh vertex colors.");
-        planeMesh->getVertexColors()->store(planeVertexColors);
-
-        Core::WeakPointer<Core::BasicMaterial> planeMaterial(engine->createMaterial<Core::BasicMaterial>());
-        planeMaterial->build();
-
-        Core::WeakPointer<MeshContainer> planeObj(engine->createObject3D<MeshContainer>());
-        engine->createRenderer<Core::MeshRenderer>(planeMaterial, planeObj);
-        planeObj->addRenderable(planeMesh);
-       // sceneRoot->addChild(planeObj);
-
-
         // ====== initial camera setup ====================
         Core::WeakPointer<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
         this->renderCamera = engine->createCamera(cameraObj);
@@ -262,13 +139,12 @@ namespace Modeler {
 
         Core::Matrix4x4 worldMatrix;
         worldMatrix.multiply(rotationMatrixA);
-        worldMatrix.translate(12, 0, 0);
+        worldMatrix.translate(0, 0, 12);
         worldMatrix.translate(0, 7, 0);
 
         cameraObj->getTransform().getLocalMatrix().copy(worldMatrix);
         cameraObj->getTransform().updateWorldMatrix();
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
-        this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->coreSync);
     }
 }
