@@ -14,8 +14,8 @@ namespace Modeler {
         if (window()) window()->update();
     }
 
-    RendererGL * RenderSurface::getRenderer() {
-        return &renderer;
+    RendererGL& RenderSurface::getRenderer() {
+        return renderer;
     }
 
     bool RenderSurface::eventFilter(QObject* obj, QEvent* event) {

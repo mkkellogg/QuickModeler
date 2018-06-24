@@ -31,6 +31,8 @@ using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
 namespace Modeler {
 
+    ModelerApp::ModelerApp(QObject *parent) : QObject(parent), engineReady(false),  orbitControls(nullptr), renderSurface(nullptr) {}
+
     void ModelerApp::initialize(QQuickView* rootView) {
         this->rootView = rootView;
         pipedGestureAdapter = std::make_shared<PipedEventAdapter<GestureAdapter::GestureEvent>>(std::bind(&ModelerApp::onGesture, this, std::placeholders::_1));
@@ -47,6 +49,7 @@ namespace Modeler {
             qDebug() << "Unable to initialize window!";
             return false;
         }
+
         this->liveWindows[(unsigned int)type] = window;
 
         if (type == AppWindowType::RenderSurface) {
@@ -57,11 +60,12 @@ namespace Modeler {
 
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
             if (renderSurface) {
+                this->renderSurface = renderSurface;
                 RendererGL::LifeCycleEventCallback initer = [this](RendererGL* renderer) {
                     this->engine = renderer->getEngine();
                     this->onEngineReady(engine);
                 };
-                renderSurface->getRenderer()->onInit(initer);
+                renderSurface->getRenderer().onInit(initer);
             }
         }
 
@@ -93,18 +97,14 @@ namespace Modeler {
             sPath = sPath.substr(7);
         }
 
-        ModelerAppWindow* renderSurfaceWindow = this->liveWindows[(unsigned int)AppWindowType::RenderSurface];
-        if (renderSurfaceWindow) {
-            RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(renderSurfaceWindow);
-            if (renderSurface) {
-                RendererGL* rendererGL = renderSurface->getRenderer();
-                RendererGL::LifeCycleEventCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
-                    Core::ModelLoader& modelLoader = engine->getModelLoader();
-                    Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
-                    this->sceneRoot->addChild(object);
-                };
-                rendererGL->onPreRender(preRenderCallback);
-            }
+        if (this->renderSurface) {
+            RendererGL& rendererGL = renderSurface->getRenderer();
+            RendererGL::LifeCycleEventCallback preRenderCallback = [this, sPath](RendererGL* renderer) {
+                Core::ModelLoader& modelLoader = engine->getModelLoader();
+                Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
+                this->sceneRoot->addChild(object);
+            };
+            rendererGL.onPreRender(preRenderCallback);
         }
     }
 
@@ -268,6 +268,6 @@ namespace Modeler {
         cameraObj->getTransform().updateWorldMatrix();
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
-        this->orbitControls = new OrbitControls(this->engine, this->renderCamera);
+        this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->renderSurface);
     }
 }

@@ -47,6 +47,7 @@ namespace Modeler {
     }
 
     void RendererGL::onPreRender(LifeCycleEventCallback func) {
+        QMutexLocker ml(&preRenderMutex);
         onPreRenders.push_back(func);
     }
 
@@ -63,6 +64,7 @@ namespace Modeler {
 
     void RendererGL::resolveOnPreRenders() {
         if (onPreRenders.size() > 0) {
+            QMutexLocker ml(&preRenderMutex);
             for(std::vector<LifeCycleEventCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
                 LifeCycleEventCallback func = *itr;
                 resolveOnPreRender(func);

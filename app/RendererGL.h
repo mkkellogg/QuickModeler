@@ -7,6 +7,7 @@
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/qquickwindow.h>
+#include <QMutex>
 
 #include "Core/Engine.h"
 #include "Core/geometry/Vector2.h"
@@ -14,6 +15,7 @@
 namespace Modeler {
     class RendererGL : public QObject, protected QOpenGLFunctions {
         Q_OBJECT
+
     public:
         typedef std::function<void(RendererGL*)> LifeCycleEventCallback;
 
@@ -38,6 +40,7 @@ namespace Modeler {
     private:
         qreal m_t;
         QQuickWindow *m_window;
+        QMutex preRenderMutex;
 
         bool initialized;
         bool engineInitialized;

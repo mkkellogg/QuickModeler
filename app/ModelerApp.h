@@ -30,7 +30,7 @@ namespace Modeler {
             RenderSurface = 1,
         };
 
-        ModelerApp(QObject *parent = 0) : QObject(parent), engineReady(false),  orbitControls(nullptr) {}
+        ModelerApp(QObject *parent = 0);
         void initialize(QQuickView* rootView);
         bool addLoadedWindow(ModelerAppWindow* window, AppWindowType type);
         bool addLoadedWindow(const std::string& windowName, AppWindowType type);
@@ -43,11 +43,12 @@ namespace Modeler {
         bool engineReady;
         QQuickView* rootView;
         ModelerAppWindow* liveWindows[MaxWindows];
-        OrbitControls* orbitControls;
+        std::shared_ptr<OrbitControls> orbitControls;
         Core::WeakPointer<Core::Camera> renderCamera;
         Core::WeakPointer<Core::Engine> engine;
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
         Core::WeakPointer<Core::Object3D> sceneRoot;
+        RenderSurface* renderSurface;
 
     public slots:
         void loadModel(const QString& path);

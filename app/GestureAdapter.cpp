@@ -44,7 +44,7 @@ namespace Modeler {
                 if (pointerState.active) {
                     GestureEvent gestureEvent(GestureEventType::Drag);
                     gestureEvent.start = pointerState.position;
-                    gestureEvent.end =  event.position;
+                    gestureEvent.end = event.position;
                     gestureEvent.pointer = (GesturePointer)pointerIndex;
                     if (this->pipedEventAdapter) {
                         this->pipedEventAdapter->accept(gestureEvent);
