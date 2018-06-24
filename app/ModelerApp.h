@@ -12,6 +12,7 @@
 #include "GestureAdapter.h"
 #include "PipedEventAdapter.h"
 #include "OrbitControls.h"
+#include "CoreSync.h"
 
 #include "Core/Engine.h"
 
@@ -22,6 +23,8 @@ namespace Modeler {
         Q_OBJECT
 
     public:
+
+
 
         const static int MaxWindows = 32;
 
@@ -49,6 +52,7 @@ namespace Modeler {
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
         Core::WeakPointer<Core::Object3D> sceneRoot;
         RenderSurface* renderSurface;
+        CoreSync* coreSync;
 
     public slots:
         void loadModel(const QString& path);

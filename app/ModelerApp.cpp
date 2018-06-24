@@ -31,7 +31,7 @@ using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
 namespace Modeler {
 
-    ModelerApp::ModelerApp(QObject *parent) : QObject(parent), engineReady(false),  orbitControls(nullptr), renderSurface(nullptr) {}
+    ModelerApp::ModelerApp(QObject *parent) : QObject(parent), engineReady(false),  orbitControls(nullptr), renderSurface(nullptr), coreSync(nullptr) {}
 
     void ModelerApp::initialize(QQuickView* rootView) {
         this->rootView = rootView;
@@ -61,6 +61,7 @@ namespace Modeler {
             RenderSurface* renderSurface = dynamic_cast<RenderSurface*>(window);
             if (renderSurface) {
                 this->renderSurface = renderSurface;
+                this->coreSync = new CoreSync(renderSurface);
                 RendererGL::LifeCycleEventCallback initer = [this](RendererGL* renderer) {
                     this->engine = renderer->getEngine();
                     this->onEngineReady(engine);
@@ -268,6 +269,6 @@ namespace Modeler {
         cameraObj->getTransform().updateWorldMatrix();
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
-        this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->renderSurface);
+        this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->coreSync);
     }
 }

@@ -11,7 +11,8 @@
 #include "RenderSurface.h"
 
 namespace Modeler {
-    OrbitControls::OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera, RenderSurface * renderSurface): engine(engine), targetCamera(targetCamera), renderSurface(renderSurface) {
+    OrbitControls::OrbitControls(Core::WeakPointer<Core::Engine> engine, Core::WeakPointer<Core::Camera> targetCamera, CoreSync* coreSync):
+        engine(engine), targetCamera(targetCamera), coreSync(coreSync) {
 
     }
 
@@ -19,7 +20,7 @@ namespace Modeler {
 
         if (event.getType() == GestureAdapter::GestureEventType::Scroll) {
 
-            RendererGL::LifeCycleEventCallback preRenderCallback = [this, event](RendererGL * renderer) {
+            CoreSync::Runnable runnable = [this, event](Core::WeakPointer<Core::Engine> engine) {
                 Core::WeakPointer<Core::Object3D> cameraObjPtr = this->targetCamera->getOwner();
                 Core::Vector3r cameraVec;
                 cameraVec.set(0, 0, -1);
@@ -27,8 +28,8 @@ namespace Modeler {
                 cameraVec = cameraVec * event.scrollDistance;
                 cameraObjPtr->getTransform().translate(cameraVec, Core::Transform::TransformationSpace::World);
             };
-            if (this->renderSurface) {
-                this->renderSurface->getRenderer().onPreRender(preRenderCallback);
+            if (this->coreSync) {
+                this->coreSync->run(runnable);
             }
 
         }
@@ -40,7 +41,7 @@ namespace Modeler {
             Core::Int32 eventEndY = event.end.y;
             GestureAdapter::GesturePointer eventPointer = event.pointer;
 
-            RendererGL::LifeCycleEventCallback preRenderCallback = [this, eventStartX, eventStartY, eventEndX, eventEndY, eventPointer](RendererGL * renderer) {
+            CoreSync::Runnable runnable = [this, eventStartX, eventStartY, eventEndX, eventEndY, eventPointer](Core::WeakPointer<Core::Engine> engine) {
 
                 Core::WeakPointer<Core::Graphics> graphics(this->engine->getGraphicsSystem());
                 Core::WeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
@@ -122,8 +123,8 @@ namespace Modeler {
                     cameraObjPtr->getTransform().translate(viewDragVector, Core::Transform::TransformationSpace::World);
                 }
            };
-           if (this->renderSurface) {
-               this->renderSurface->getRenderer().onPreRender(preRenderCallback);
+           if (this->coreSync) {
+               this->coreSync->run(runnable);
            }
         }
 

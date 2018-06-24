@@ -20,6 +20,7 @@ namespace Modeler {
             initialized = true;
         }
         update();
+        this->resolveOnUpdates();
         this->resolveOnPreRenders();
         render();
     }
@@ -47,8 +48,13 @@ namespace Modeler {
     }
 
     void RendererGL::onPreRender(LifeCycleEventCallback func) {
-        QMutexLocker ml(&preRenderMutex);
+        QMutexLocker ml(&this->preRenderMutex);
         onPreRenders.push_back(func);
+    }
+
+    void RendererGL::onUpdate(LifeCycleEventCallback func) {
+        QMutexLocker ml(&this->updateMutex);
+        onUpdates.push_back(func);
     }
 
     void RendererGL::resolveOnInits() {
@@ -62,19 +68,26 @@ namespace Modeler {
         callback(this);
     }
 
-    void RendererGL::resolveOnPreRenders() {
-        if (onPreRenders.size() > 0) {
-            QMutexLocker ml(&preRenderMutex);
-            for(std::vector<LifeCycleEventCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
+    void RendererGL::resolveOnUpdates() {
+        if (onUpdates.size() > 0) {
+            QMutexLocker ml(&this->updateMutex);
+            for(std::vector<LifeCycleEventCallback>::iterator itr = onUpdates.begin(); itr != onUpdates.end(); ++itr) {
                 LifeCycleEventCallback func = *itr;
-                resolveOnPreRender(func);
+                func(this);
             }
-            onPreRenders.clear();
+            onUpdates.clear();
         }
     }
 
-    void RendererGL::resolveOnPreRender(LifeCycleEventCallback callback) {
-        callback(this);
+    void RendererGL::resolveOnPreRenders() {
+        if (onPreRenders.size() > 0) {
+            QMutexLocker ml(&this->preRenderMutex);
+            for(std::vector<LifeCycleEventCallback>::iterator itr = onPreRenders.begin(); itr != onPreRenders.end(); ++itr) {
+                LifeCycleEventCallback func = *itr;
+                func(this);
+            }
+            onPreRenders.clear();
+        }
     }
 
     bool RendererGL::isEngineInitialized() {

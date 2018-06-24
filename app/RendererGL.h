@@ -31,6 +31,7 @@ namespace Modeler {
 
         Core::WeakPointer<Core::Engine> getEngine();
         void onInit(LifeCycleEventCallback func);
+        void onUpdate(LifeCycleEventCallback func);
         void onPreRender(LifeCycleEventCallback func);
         bool isEngineInitialized();
 
@@ -41,6 +42,7 @@ namespace Modeler {
         qreal m_t;
         QQuickWindow *m_window;
         QMutex preRenderMutex;
+        QMutex updateMutex;
 
         bool initialized;
         bool engineInitialized;
@@ -48,6 +50,7 @@ namespace Modeler {
         std::shared_ptr<Core::Engine> engine;
 
         std::vector<LifeCycleEventCallback> onInits;
+        std::vector<LifeCycleEventCallback> onUpdates;
         std::vector<LifeCycleEventCallback> onPreRenders;
 
         void init();
@@ -57,8 +60,8 @@ namespace Modeler {
 
         void resolveOnInits();
         void resolveOnInit(LifeCycleEventCallback callback);
-
+        void resolveOnUpdates();
         void resolveOnPreRenders();
-        void resolveOnPreRender(LifeCycleEventCallback callback);
+
     };
 }
