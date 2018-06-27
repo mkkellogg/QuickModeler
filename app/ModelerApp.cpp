@@ -15,6 +15,7 @@
 #include "Core/math/Quaternion.h"
 #include "Core/render/Camera.h"
 #include "Core/color/Color.h"
+#include "Core/color/IntColor.h"
 #include "Core/material/StandardAttributes.h"
 #include "Core/geometry/Mesh.h"
 #include "Core/render/RenderableContainer.h"
@@ -24,8 +25,12 @@
 #include "Core/material/StandardAttributes.h"
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
+#include "Core/image/Texture2D.h"
 #include "Core/util/WeakPointer.h"
 #include "Core/asset/ModelLoader.h"
+#include "Core/image/RawImage.h"
+#include "Core/image/ImagePainter.h"
+#include "Core/material/BasicTexturedMaterial.h"
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
@@ -145,6 +150,79 @@ namespace Modeler {
         cameraObj->getTransform().getLocalMatrix().copy(worldMatrix);
         cameraObj->getTransform().updateWorldMatrix();
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
+
+
+
+
+
+        Core::Real gridPlaneVertices[] = {
+            -1.0, 0.0, -1.0, 1.0, 1.0, 0.0, -1.0, 1.0, -1.0, 0.0, 1.0, 1.0,
+            1.0, 0.0, -1.0, 1.0, -1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0
+        };
+
+        Core::Real gridPlaneColors[] = {
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+        };
+
+        Core::Real gridPlaneUVs[] = {
+            0.0, 1.0, 1.0, 1.0, 0.0, 0.0,
+            1.0, 1.0, 0.0, 0.0, 1.0, 0.0
+        };
+
+        Core::WeakPointer<Core::Mesh> gridPlane(engine->createMesh(6, false));
+        gridPlane->init();
+        gridPlane->enableAttribute(Core::StandardAttribute::Position);
+        Core::Bool positionInited = gridPlane->initVertexPositions();
+        ASSERT(positionInited, "Unable to initialize grid plane mesh vertex positions.");
+        gridPlane->getVertexPositions()->store(gridPlaneVertices);
+
+        gridPlane->enableAttribute(Core::StandardAttribute::Color);
+        Core::Bool colorInited = gridPlane->initVertexColors();
+        ASSERT(colorInited, "Unable to initialize grid plane mesh vertex colors.");
+        gridPlane->getVertexColors()->store(gridPlaneColors);
+
+        gridPlane->enableAttribute(Core::StandardAttribute::UV0);
+        Core::Bool uvsInited = gridPlane->initVertexUVs();
+        ASSERT(uvsInited, "Unable to initialize grid plane mesh vertex uvs.");
+        gridPlane->getVertexUVs()->store(gridPlaneUVs);
+
+        Core::WeakPointer<MeshContainer> gridPlaneObj(engine->createObject3D<MeshContainer>());
+
+        Core::TextureAttributes texAttributes;
+        texAttributes.FilterMode = Core::TextureFilter::TriLinear;
+        texAttributes.MipMapLevel = 4;
+        Core::WeakPointer<Core::Texture2D> texture = engine->getGraphicsSystem()->createTexture2D(texAttributes);
+
+        Core::UInt32 gridTextureSize = 512;
+        Core::RawImage * rawImage = new Core::RawImage(gridTextureSize, gridTextureSize);
+        rawImage->init();
+
+        Core::ImagePainter texturePainter(rawImage);
+        texturePainter.setDrawColor(Core::IntColor4(255, 255, 255, 255));
+
+        Core::UInt32 gridLineWidth = 2;
+        Core::UInt32 gridLineHalfWidth = gridLineWidth / 2;
+        Core::UInt32 cellSize = 32;
+        Core::UInt32 halfCellSize = cellSize / 2;
+
+        for (Core::UInt32 x = halfCellSize; x < gridTextureSize; x += cellSize) {
+            for (Core::UInt32 w = x - gridLineHalfWidth; w < x + gridLineHalfWidth; w++) {
+                texturePainter.drawVerticalLine(w, halfCellSize, gridTextureSize - cellSize);
+                texturePainter.drawHorizontalLine(halfCellSize, w, gridTextureSize - cellSize);
+            }
+        }
+
+        texture->build(rawImage);
+
+        Core::WeakPointer<Core::BasicTexturedMaterial> gridPlaneMaterial = engine->createMaterial<Core::BasicTexturedMaterial>();
+        gridPlaneMaterial->setTexture(texture);
+
+        Core::WeakPointer<Core::MeshRenderer> gridPlaneRenderer(engine->createRenderer<Core::MeshRenderer>(gridPlaneMaterial, gridPlaneObj));
+        gridPlaneObj->addRenderable(gridPlane);
+        this->sceneRoot->addChild(gridPlaneObj);
+        gridPlaneObj->getTransform().getLocalMatrix().scale(10.0f, 10.0f, 10.0f);
+
 
     }
 }

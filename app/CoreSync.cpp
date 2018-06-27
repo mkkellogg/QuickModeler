@@ -11,7 +11,6 @@ namespace Modeler {
     }
 
     void CoreSync::run(Runnable runnable) {
-        QMutexLocker ml(&this->sync);
         RendererGL::LifeCycleEventCallback temp = [this, runnable](RendererGL* renderer) {
             runnable(this->renderSurface->getRenderer().getEngine());
         };
