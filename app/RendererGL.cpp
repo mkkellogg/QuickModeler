@@ -31,8 +31,7 @@ namespace Modeler {
 
     void RendererGL::init() {
         if (!engineInitialized) {
-          engine = std::make_shared<Core::Engine>();
-          engine->init();
+          engine = Core::Engine::instance();
           engineInitialized = true;
         }
         resolveOnInits();

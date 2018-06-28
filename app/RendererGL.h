@@ -47,7 +47,7 @@ namespace Modeler {
         bool initialized;
         bool engineInitialized;
         bool engineWindowSizeSet;
-        std::shared_ptr<Core::Engine> engine;
+        Core::PersistentWeakPointer<Core::Engine> engine;
 
         std::vector<LifeCycleEventCallback> onInits;
         std::vector<LifeCycleEventCallback> onUpdates;
