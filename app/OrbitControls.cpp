@@ -78,7 +78,7 @@ namespace Modeler {
                 Core::Real dot = Core::Vector3r::dot(viewStartN, viewEndN);
                  Core::Real angle = 0.0f;
                 if (dot < 1.0f && dot > -1.0f) {
-                    angle = Core::Math::ACos(dot);
+                    angle = Core::Math::aCos(dot);
                 }
                 else if (dot <= -1.0f) {
                     angle = 180.0f;
@@ -97,7 +97,7 @@ namespace Modeler {
                 using GesturePointer = GestureAdapter::GesturePointer;
                 if (eventPointer == GesturePointer::Secondary) {
 
-                    Core::Real rotationScaleFactor = Core::Math::Max(distanceFromOrigin, 1.0f);
+                    Core::Real rotationScaleFactor = Core::Math::max(distanceFromOrigin, 1.0f);
                     Core::Quaternion qA;
                     qA.fromAngleAxis(angle * rotationScaleFactor, rotAxis);
                     Core::Matrix4x4 rot = qA.rotationMatrix();
