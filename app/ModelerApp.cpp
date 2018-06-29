@@ -153,40 +153,6 @@ namespace Modeler {
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
 
-
-
-
-       /* Core::Real gridPlaneVertices[] = {
-            -1.0, 0.0, -1.0, 1.0, 1.0, 0.0, -1.0, 1.0, -1.0, 0.0, 1.0, 1.0,
-            1.0, 0.0, -1.0, 1.0, -1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0
-        };
-
-        Core::Real gridPlaneColors[] = {
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
-        };
-
-        Core::Real gridPlaneUVs[] = {
-            0.0, 1.0, 1.0, 1.0, 0.0, 0.0,
-            1.0, 1.0, 0.0, 0.0, 1.0, 0.0
-        };
-
-        Core::WeakPointer<Core::Mesh> gridPlane(engine->createMesh(6, false));
-        gridPlane->enableAttribute(Core::StandardAttribute::Position);
-        Core::Bool positionInited = gridPlane->initVertexPositions();
-        ASSERT(positionInited, "Unable to initialize grid plane mesh vertex positions.");
-        gridPlane->getVertexPositions()->store(gridPlaneVertices);
-
-        gridPlane->enableAttribute(Core::StandardAttribute::Color);
-        Core::Bool colorInited = gridPlane->initVertexColors();
-        ASSERT(colorInited, "Unable to initialize grid plane mesh vertex colors.");
-        gridPlane->getVertexColors()->store(gridPlaneColors);
-
-        gridPlane->enableAttribute(Core::StandardAttribute::UV0);
-        Core::Bool uvsInited = gridPlane->initVertexUVs();
-        ASSERT(uvsInited, "Unable to initialize grid plane mesh vertex uvs.");
-        gridPlane->getVertexUVs()->store(gridPlaneUVs);*/
-
         Core::UInt32 gridMeshSubdivisions = 10;
         Core::Real gridSize = 15.0f;
         Core::Real texToWorld = 5.0f;
@@ -210,14 +176,14 @@ namespace Modeler {
 
 
         Core::Real gridCellTextureSize = gridCellWorldSize / texToWorld;
-        Core::UInt32 gridLineWidth = 2;
+        Core::UInt32 gridLineWidth = 4;
         Core::UInt32 gridLineHalfWidth = gridLineWidth / 2;
         Core::UInt32 cellSize = (Core::UInt32)(gridCellTextureSize * (Core::Real)gridTextureSize);
         Core::UInt32 halfCellSize = cellSize / 2;
 
         for (Core::UInt32 x = halfCellSize; x < gridTextureSize; x += cellSize) {
-            Core::UInt32 upper = x + gridLineHalfWidth;
-            if (gridLineHalfWidth == 0) upper++;
+            Core::UInt32 upper = x + gridLineHalfWidth - 1;
+            if (gridLineHalfWidth == 0) upper = x + 1;
             for (Core::UInt32 w = x - gridLineHalfWidth; w < upper; w++) {
                 texturePainter.drawVerticalLine(w, 0, gridTextureSize);
                 texturePainter.drawHorizontalLine(0, w, gridTextureSize);
@@ -226,15 +192,13 @@ namespace Modeler {
 
         texture->build(rawImage);
 
-        Core::WeakPointer<Core::BasicTexturedMaterial> gridPlaneMaterial = engine->createMaterial<Core::BasicTexturedMaterial>();
+        Core::WeakPointer<GridMaterial> gridPlaneMaterial = engine->createMaterial<GridMaterial>();
         gridPlaneMaterial->setTexture(texture);
 
         Core::WeakPointer<Core::MeshRenderer> gridPlaneRenderer(engine->createRenderer<Core::MeshRenderer>(gridPlaneMaterial, gridPlaneObj));
         gridPlaneObj->addRenderable(gridPlane);
         this->sceneRoot->addChild(gridPlaneObj);
         gridPlaneObj->getTransform().rotate(1, 0, 0, -Core::Math::PI / 2.0f);
-        //gridPlaneObj->getTransform().getLocalMatrix().scale(10.0f, 10.0f, 10.0f);
-
 
     }
 }
