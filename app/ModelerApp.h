@@ -16,6 +16,7 @@
 
 #include "Core/Engine.h"
 #include "Core/material/BasicTexturedMaterial.h"
+#include "Core/material/Shader.h"
 
 static const char gridMaterial_vertex[] =
     "#version 100\n"
@@ -39,11 +40,12 @@ static  const char gridMaterial_fragment[] =
     "#version 100\n"
     "precision mediump float;\n"
     "uniform sampler2D textureA;\n"
+    "uniform vec4 bounds;\n"
     "varying vec4 vColor;\n"
     "varying vec2 vUV;\n"
     "varying vec4 vPos;\n"
     "void main() {\n"
-    "    vec4 bounds = vec4(-7.011, -7.011, -6.986, -6.986);\n"
+   // "    vec4 bounds = vec4(-7.011, -7.011, -6.986, -6.986);\n"
     "    vec4 testPos = vec4(vPos.x, vPos.y, -vPos.x, -vPos.y);\n"
     "    vec4 testResults = step(bounds, testPos);\n"
     "    float alpha = testResults.x * testResults.y * testResults.z * testResults.w;\n"
@@ -58,6 +60,7 @@ namespace Modeler {
         GridMaterial(Core::WeakPointer<Core::Graphics> graphics): BasicTexturedMaterial(graphics) {
 
         }
+
         Core::Bool build() override {
             const std::string& vertexSrc = gridMaterial_vertex;
             const std::string& fragmentSrc = gridMaterial_fragment;
@@ -66,8 +69,22 @@ namespace Modeler {
                return false;
             }
             this->bindShaderVarLocations();
+            this->boundsLocation = this->shader->getUniformLocation("bounds");
             return true;
         }
+
+        void sendCustomUniformsToShader() override {
+             Core::BasicTexturedMaterial::sendCustomUniformsToShader();
+             //std::cerr << this->bounds.x << ", " << this->bounds.y << ", " << this->bounds.z << ", " << this->bounds.w << std::endl;
+             this->shader->setUniform4f(this->boundsLocation, this->bounds.x, this->bounds.y, this->bounds.z, this->bounds.w);
+        }
+
+        void setBounds(const Core::Vector4r& bounds) {
+            this->bounds = bounds;
+        }
+    private:
+        Core::Vector4r bounds;
+        Core::Int32 boundsLocation;
     };
 
     class ModelerApp: public QObject {

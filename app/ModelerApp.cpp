@@ -194,6 +194,7 @@ namespace Modeler {
 
         Core::WeakPointer<GridMaterial> gridPlaneMaterial = engine->createMaterial<GridMaterial>();
         gridPlaneMaterial->setTexture(texture);
+        gridPlaneMaterial->setBounds(Core::Vector4r(-7.011, -7.011, -6.986, -6.986));
 
         Core::WeakPointer<Core::MeshRenderer> gridPlaneRenderer(engine->createRenderer<Core::MeshRenderer>(gridPlaneMaterial, gridPlaneObj));
         gridPlaneObj->addRenderable(gridPlane);
