@@ -32,6 +32,7 @@
 #include "Core/image/ImagePainter.h"
 #include "Core/material/BasicTexturedMaterial.h"
 #include "Core/geometry/GeometryUtils.h"
+#include "Core/light/PointLight.h"
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
@@ -168,11 +169,11 @@ namespace Modeler {
         Core::WeakPointer<Core::Texture2D> texture = engine->getGraphicsSystem()->createTexture2D(texAttributes);
 
         Core::UInt32 gridTextureSize = 1024;
-        Core::RawImage * rawImage = new Core::RawImage(gridTextureSize, gridTextureSize);
+        std::shared_ptr<Core::RawImage> rawImage = std::make_shared<Core::RawImage>(gridTextureSize, gridTextureSize);
         rawImage->init();
 
         Core::ImagePainter texturePainter(rawImage);
-        texturePainter.setDrawColor(Core::IntColor4(255, 255, 255, 255));
+        texturePainter.setDrawColor(Core::IntColor(255, 255, 255, 255));
 
 
         Core::Real gridCellTextureSize = gridCellWorldSize / texToWorld;
@@ -200,6 +201,41 @@ namespace Modeler {
         gridPlaneObj->addRenderable(gridPlane);
         this->sceneRoot->addChild(gridPlaneObj);
         gridPlaneObj->getTransform().rotate(1, 0, 0, -Core::Math::PI / 2.0f);
+
+
+        Core::WeakPointer<Core::Object3D> lightObject = engine->createObject3D();
+        this->sceneRoot->addChild(lightObject);
+        Core::WeakPointer<Core::PointLight> pointLight = engine->createLight<Core::PointLight>(lightObject);
+        pointLight->setColor(1.0f, 0.6f, 0.0f, 1.0f);
+        pointLight->setRadius(10.0f);
+
+        engine->onUpdate([this, lightObject]() {
+
+          static Core::Real rotationAngle = 0.0;
+          if (Core::WeakPointer<Core::Object3D>::isValid(lightObject)) {
+            rotationAngle += 0.01;
+            if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
+
+            Core::Quaternion qA;
+            qA.fromAngleAxis(rotationAngle, 0, 1, 0);
+            Core::Matrix4x4 rotationMatrixA;
+            qA.rotationMatrix(rotationMatrixA);
+
+            Core::Quaternion qB;
+            qB.fromAngleAxis(-0.8, 1, 0, 0);
+            Core::Matrix4x4 rotationMatrixB;
+            qB.rotationMatrix(rotationMatrixB);
+
+            Core::Matrix4x4 worldMatrix;
+
+            worldMatrix.preTranslate(15.0f, 10.0f, 0.0f);
+            worldMatrix.preMultiply(rotationMatrixA);
+            //worldMatrix.multiply(rotationMatrixB);
+
+            Core::WeakPointer<Core::Object3D> lightObjectPtr = lightObject;
+            lightObjectPtr->getTransform().getLocalMatrix().copy(worldMatrix);
+          }
+        }, true);
 
     }
 }
