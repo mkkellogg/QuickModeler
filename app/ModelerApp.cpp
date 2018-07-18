@@ -22,6 +22,7 @@
 #include "Core/render/MeshRenderer.h"
 #include "Core/material/BasicCubeMaterial.h"
 #include "Core/material/BasicMaterial.h"
+#include "Core/material/BasicLitMaterial.h"
 #include "Core/material/StandardAttributes.h"
 #include "Core/image/RawImage.h"
 #include "Core/image/CubeTexture.h"
@@ -33,6 +34,8 @@
 #include "Core/material/BasicTexturedMaterial.h"
 #include "Core/geometry/GeometryUtils.h"
 #include "Core/light/PointLight.h"
+#include "Core/light/AmbientLight.h"
+
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
 
@@ -136,7 +139,7 @@ namespace Modeler {
 
         // ====== initial camera setup ====================
         Core::WeakPointer<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
-        this->renderCamera = engine->createCamera(cameraObj);
+        this->renderCamera = engine->createPerspectiveCamera(cameraObj, Core::Camera::DEFAULT_FOV, Core::Camera::DEFAULT_ASPECT_RATIO, 0.1f, 100);
         this->sceneRoot->addChild(cameraObj);
 
         Core::Quaternion qA;
@@ -147,7 +150,7 @@ namespace Modeler {
         Core::Matrix4x4 worldMatrix;
         worldMatrix.multiply(rotationMatrixA);
         worldMatrix.translate(0, 0, 12);
-        worldMatrix.translate(0, 7, 0);
+        worldMatrix.translate(0, 5, 0);
 
         cameraObj->getTransform().getLocalMatrix().copy(worldMatrix);
         cameraObj->getTransform().updateWorldMatrix();
@@ -203,16 +206,23 @@ namespace Modeler {
         gridPlaneObj->getTransform().rotate(1, 0, 0, -Core::Math::PI / 2.0f);
 
 
-        Core::WeakPointer<Core::Object3D> lightObject = engine->createObject3D();
-        this->sceneRoot->addChild(lightObject);
-        Core::WeakPointer<Core::PointLight> pointLight = engine->createLight<Core::PointLight>(lightObject);
+
+        Core::WeakPointer<Core::Object3D> ambientLightObject = engine->createObject3D();
+        //this->sceneRoot->addChild(ambientLightObject);
+        Core::WeakPointer<Core::AmbientLight> ambientLight = engine->createLight<Core::AmbientLight>(ambientLightObject, true);
+        ambientLight->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+        Core::WeakPointer<Core::Object3D> pointLightObject = engine->createObject3D();
+        this->sceneRoot->addChild(pointLightObject);
+        Core::WeakPointer<Core::PointLight> pointLight = engine->createLight<Core::PointLight>(pointLightObject, true);
         pointLight->setColor(1.0f, 0.6f, 0.0f, 1.0f);
         pointLight->setRadius(10.0f);
 
-        engine->onUpdate([this, lightObject]() {
+        engine->onUpdate([this, pointLightObject]() {
 
           static Core::Real rotationAngle = 0.0;
-          if (Core::WeakPointer<Core::Object3D>::isValid(lightObject)) {
+          if (Core::WeakPointer<Core::Object3D>::isValid(pointLightObject)) {
             rotationAngle += 0.01;
             if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
 
@@ -228,14 +238,168 @@ namespace Modeler {
 
             Core::Matrix4x4 worldMatrix;
 
-            worldMatrix.preTranslate(15.0f, 10.0f, 0.0f);
+            worldMatrix.preTranslate(10.0f, 10.0f, 0.0f);
             worldMatrix.preMultiply(rotationMatrixA);
             //worldMatrix.multiply(rotationMatrixB);
 
-            Core::WeakPointer<Core::Object3D> lightObjectPtr = lightObject;
+            Core::WeakPointer<Core::Object3D> lightObjectPtr = pointLightObject;
             lightObjectPtr->getTransform().getLocalMatrix().copy(worldMatrix);
           }
         }, true);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       Core::Real cubeVertexPositions[] = {
+                  // back
+                  -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
+                  -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
+                  // left
+                  -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0,
+                  -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0,
+                  // right
+                  1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
+                  1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                  // top
+                  -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
+                  // bottom
+                  -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+                  -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0,
+                  // front
+                  1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0,
+                  1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0
+              };
+
+        Core::Real cubeVertexNormals[] = {
+                  // back
+                  0.0, 0.0, -1.0, 0.0,  0.0, 0.0, -1.0, 0.0,  0.0, 0.0, -1.0, 0.0,
+                   0.0, 0.0, -1.0, 0.0,  0.0, 0.0, -1.0, 0.0,  0.0, 0.0, -1.0, 0.0,
+                  // left
+                  -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0,
+                  -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0,
+                  // right
+                  1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+                  1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+                  // top
+                  0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                  0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                  // bottom
+                  0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0,
+                  0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0,
+                  // front
+                   0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,
+                  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,
+              };
+
+
+        Core::Color slabColor(0.5f, 0.5f, 0.5f, 1.0f);
+
+              Core::Real cubeVertexColors[] = {
+                  // back
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  // left
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  // right
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  // top
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  // bottom
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  // front
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+                  0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+              };
+
+              Core::WeakPointer<Core::BasicLitMaterial> cubeMaterial(engine->createMaterial<Core::BasicLitMaterial>());
+              cubeMaterial->build();
+
+
+              // ======= slab ===============
+              Core::WeakPointer<Core::Mesh> slab(engine->createMesh(36, false));
+              slab->init();
+              slab->enableAttribute(Core::StandardAttribute::Position);
+              Core::Bool positionInited = slab->initVertexPositions();
+              ASSERT(positionInited, "Unable to initialize slab mesh vertex positions.");
+              slab->getVertexPositions()->store(cubeVertexPositions);
+
+              slab->enableAttribute(Core::StandardAttribute::Color);
+              Core::Bool colorInited = slab->initVertexColors();
+              ASSERT(colorInited, "Unable to initialize slab mesh vertex colors.");
+              slab->getVertexColors()->store(cubeVertexColors);
+
+              slab->enableAttribute(Core::StandardAttribute::Normal);
+              Core::Bool normalInited = slab->initVertexNormals();
+              ASSERT(normalInited, "Unable to initialize slab mesh vertex normals.");
+              slab->getVertexNormals()->store(cubeVertexNormals);
+
+              slab->enableAttribute(Core::StandardAttribute::FaceNormal);
+              Core::Bool faceNormalInited = slab->initVertexFaceNormals();
+
+              slab->calculateNormals(85.0f);
+
+
+              Core::WeakPointer<MeshContainer> leftSlabObj(engine->createObject3D<MeshContainer>());
+              Core::WeakPointer<Core::MeshRenderer> leftSlabRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, leftSlabObj));
+              leftSlabObj->addRenderable(slab);
+             // sceneRoot->addChild(leftSlabObj);
+              leftSlabObj->getTransform().getLocalMatrix().scale(1.0f, 15.0f, 15.0f);
+              leftSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(-15.0f, 0.0f, 0.0f));
+
+
+
+              Core::WeakPointer<MeshContainer> bottomSlabObj(engine->createObject3D<MeshContainer>());
+              Core::WeakPointer<Core::MeshRenderer> bottomSlabRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, bottomSlabObj));
+              bottomSlabObj->addRenderable(slab);
+              sceneRoot->addChild(bottomSlabObj);
+              bottomSlabObj->getTransform().getLocalMatrix().scale(15.0f, 1.0f, 15.0f);
+              bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -0.48f, 0.0f));
+
+
+              Core::WeakPointer<MeshContainer> rightSlabObj(engine->createObject3D<MeshContainer>());
+              Core::WeakPointer<Core::MeshRenderer> rightSlabRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, rightSlabObj));
+              rightSlabObj->addRenderable(slab);
+             // sceneRoot->addChild(rightSlabObj);
+              rightSlabObj->getTransform().getLocalMatrix().scale(1.0f, 15.0f, 15.0f);
+              rightSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(15.0f, 0.0f, 0.0f));
+
+
+              Core::WeakPointer<MeshContainer> frontSlabObj(engine->createObject3D<MeshContainer>());
+              Core::WeakPointer<Core::MeshRenderer> frontSlabRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, frontSlabObj));
+              frontSlabObj->addRenderable(slab);
+             // sceneRoot->addChild(frontSlabObj);
+              frontSlabObj->getTransform().getLocalMatrix().scale(15.0f, 15.0f, 1.0f);
+              frontSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 0.0f, -15.0f));
+
+
+
+              Core::WeakPointer<MeshContainer> centerCubeObj(engine->createObject3D<MeshContainer>());
+              Core::WeakPointer<Core::MeshRenderer> centerCubeRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, centerCubeObj));
+              centerCubeObj->addRenderable(slab);
+             // sceneRoot->addChild(centerCubeObj);
+
+              centerCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 5.0f, 0.0f));
+
+
+
 
     }
 }

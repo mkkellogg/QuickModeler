@@ -23,6 +23,7 @@ namespace Modeler {
         this->resolveOnUpdates();
         this->resolveOnPreRenders();
         render();
+        m_window->resetOpenGLState();
     }
 
     Core::WeakPointer<Core::Engine> RendererGL::getEngine() {

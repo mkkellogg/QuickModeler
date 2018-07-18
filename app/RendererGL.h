@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <QtGui/QOpenGLShaderProgram>
-#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLFunctions_3_3_Core>
 #include <QtQuick/qquickwindow.h>
 #include <QMutex>
 
@@ -13,7 +13,7 @@
 #include "Core/geometry/Vector2.h"
 
 namespace Modeler {
-    class RendererGL : public QObject, protected QOpenGLFunctions {
+    class RendererGL : public QObject, protected QOpenGLFunctions_3_3_Core {
         Q_OBJECT
 
     public:

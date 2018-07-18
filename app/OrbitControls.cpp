@@ -43,10 +43,10 @@ namespace Modeler {
 
             CoreSync::Runnable runnable = [this, eventStartX, eventStartY, eventEndX, eventEndY, eventPointer](Core::WeakPointer<Core::Engine> engine) {
 
-                Core::WeakPointer<Core::Graphics> graphics(this->engine->getGraphicsSystem());
-                Core::WeakPointer<Core::Renderer> rendererPtr(graphics->getRenderer());
+                Core::WeakPointer<Core::Graphics> graphics = this->engine->getGraphicsSystem();
+                Core::WeakPointer<Core::Renderer> rendererPtr = graphics->getRenderer();
 
-                Core::Vector4u viewport = rendererPtr->getViewport();
+                Core::Vector4u viewport = graphics->getViewport();
                 Core::Real ndcStartX = (Core::Real)eventStartX / viewport.z * 2.0f - 1.0f;
                 Core::Real ndcStartY = (Core::Real)eventStartY / viewport.w * 2.0f - 1.0f;
                 Core::Real ndcEndX = (Core::Real)eventEndX / viewport.z * 2.0f - 1.0f;
