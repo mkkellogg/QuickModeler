@@ -20,6 +20,7 @@
 #include "Core/geometry/Mesh.h"
 #include "Core/render/RenderableContainer.h"
 #include "Core/render/MeshRenderer.h"
+#include "Core/render/RenderTarget.h"
 #include "Core/material/BasicCubeMaterial.h"
 #include "Core/material/BasicMaterial.h"
 #include "Core/material/BasicLitMaterial.h"
@@ -35,6 +36,8 @@
 #include "Core/geometry/GeometryUtils.h"
 #include "Core/light/PointLight.h"
 #include "Core/light/AmbientLight.h"
+#include "Core/light/DirectionalLight.h"
+#include "Core/scene/Transform.h"
 
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
@@ -113,6 +116,7 @@ namespace Modeler {
                 Core::ModelLoader& modelLoader = engine->getModelLoader();
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
+                object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::Transform::TransformationSpace::World);
             };
             this->coreSync->run(runnable);
         }
@@ -202,50 +206,11 @@ namespace Modeler {
 
         Core::WeakPointer<Core::MeshRenderer> gridPlaneRenderer(engine->createRenderer<Core::MeshRenderer>(gridPlaneMaterial, gridPlaneObj));
         gridPlaneObj->addRenderable(gridPlane);
-        this->sceneRoot->addChild(gridPlaneObj);
+      //  this->sceneRoot->addChild(gridPlaneObj);
         gridPlaneObj->getTransform().rotate(1, 0, 0, -Core::Math::PI / 2.0f);
 
 
 
-        Core::WeakPointer<Core::Object3D> ambientLightObject = engine->createObject3D();
-        //this->sceneRoot->addChild(ambientLightObject);
-        Core::WeakPointer<Core::AmbientLight> ambientLight = engine->createLight<Core::AmbientLight>(ambientLightObject, true);
-        ambientLight->setColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-
-        Core::WeakPointer<Core::Object3D> pointLightObject = engine->createObject3D();
-        this->sceneRoot->addChild(pointLightObject);
-        Core::WeakPointer<Core::PointLight> pointLight = engine->createLight<Core::PointLight>(pointLightObject, true);
-        pointLight->setColor(1.0f, 0.6f, 0.0f, 1.0f);
-        pointLight->setRadius(10.0f);
-
-        engine->onUpdate([this, pointLightObject]() {
-
-          static Core::Real rotationAngle = 0.0;
-          if (Core::WeakPointer<Core::Object3D>::isValid(pointLightObject)) {
-            rotationAngle += 0.01;
-            if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
-
-            Core::Quaternion qA;
-            qA.fromAngleAxis(rotationAngle, 0, 1, 0);
-            Core::Matrix4x4 rotationMatrixA;
-            qA.rotationMatrix(rotationMatrixA);
-
-            Core::Quaternion qB;
-            qB.fromAngleAxis(-0.8, 1, 0, 0);
-            Core::Matrix4x4 rotationMatrixB;
-            qB.rotationMatrix(rotationMatrixB);
-
-            Core::Matrix4x4 worldMatrix;
-
-            worldMatrix.preTranslate(10.0f, 10.0f, 0.0f);
-            worldMatrix.preMultiply(rotationMatrixA);
-            //worldMatrix.multiply(rotationMatrixB);
-
-            Core::WeakPointer<Core::Object3D> lightObjectPtr = pointLightObject;
-            lightObjectPtr->getTransform().getLocalMatrix().copy(worldMatrix);
-          }
-        }, true);
 
 
 
@@ -354,7 +319,7 @@ namespace Modeler {
               slab->enableAttribute(Core::StandardAttribute::FaceNormal);
               Core::Bool faceNormalInited = slab->initVertexFaceNormals();
 
-              slab->calculateNormals(85.0f);
+              slab->calculateNormals(75.0f);
 
 
               Core::WeakPointer<MeshContainer> leftSlabObj(engine->createObject3D<MeshContainer>());
@@ -399,6 +364,61 @@ namespace Modeler {
               centerCubeObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, 5.0f, 0.0f));
 
 
+
+
+
+
+
+
+
+              Core::WeakPointer<Core::Object3D> ambientLightObject = engine->createObject3D();
+              this->sceneRoot->addChild(ambientLightObject);
+              Core::WeakPointer<Core::AmbientLight> ambientLight = engine->createLight<Core::AmbientLight>(ambientLightObject);
+              ambientLight->setColor(0.25f, 0.25f, 0.25f, 1.0f);
+
+              Core::WeakPointer<Core::Object3D> pointLightObject = engine->createObject3D();
+              this->sceneRoot->addChild(pointLightObject);
+              Core::WeakPointer<Core::PointLight> pointLight = engine->createPointLight<Core::PointLight>(pointLightObject, true, 2048, 0.0, 0.3);
+              pointLight->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+              pointLight->setRadius(10.0f);
+
+              Core::WeakPointer<Core::Object3D> directionalLightObject = engine->createObject3D();
+              this->sceneRoot->addChild(directionalLightObject);
+              Core::WeakPointer<Core::DirectionalLight> directionalLight = engine->createDirectionalLight<Core::DirectionalLight>(directionalLightObject, 3, true, 4096, 0.0003, 0.0);
+              directionalLight->setColor(1.0, 1.0, 1.0, 1.0f);
+              directionalLightObject->getTransform().lookAt(Core::Point3r(1.0f, -1.0f, 1.0f));
+
+              engine->onUpdate([this, pointLightObject]() {
+
+                static Core::Real rotationAngle = 0.0;
+                if (Core::WeakPointer<Core::Object3D>::isValid(pointLightObject)) {
+                  rotationAngle += 0.01;
+                  if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
+
+                  Core::Quaternion qA;
+                  qA.fromAngleAxis(rotationAngle, 0, 1, 0);
+                  Core::Matrix4x4 rotationMatrixA;
+                  qA.rotationMatrix(rotationMatrixA);
+
+                  Core::Quaternion qB;
+                  qB.fromAngleAxis(-0.8, 1, 0, 0);
+                  Core::Matrix4x4 rotationMatrixB;
+                  qB.rotationMatrix(rotationMatrixB);
+
+                  Core::Matrix4x4 worldMatrix;
+
+                  worldMatrix.preTranslate(10.0f, 10.0f, 0.0f);
+                  worldMatrix.preMultiply(rotationMatrixA);
+                  //worldMatrix.multiply(rotationMatrixB);
+
+                  Core::WeakPointer<Core::Object3D> lightObjectPtr = pointLightObject;
+                  lightObjectPtr->getTransform().getLocalMatrix().copy(worldMatrix);
+
+                  auto vp = Core::Engine::instance()->getGraphicsSystem()->getCurrentRenderTarget()->getViewport();
+                 // std::cerr << vp.z << ", " << vp.w << std::endl;
+                  this->renderCamera->setAspectRatioFromDimensions(vp.z, vp.w);
+                }
+              }, true);
 
 
     }
