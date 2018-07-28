@@ -392,7 +392,7 @@ namespace Modeler {
 
                 static Core::Real rotationAngle = 0.0;
                 if (Core::WeakPointer<Core::Object3D>::isValid(pointLightObject)) {
-                  rotationAngle += 0.01;
+                  rotationAngle += 0.6 * Core::Time::getDeltaTime();
                   if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
 
                   Core::Quaternion qA;
