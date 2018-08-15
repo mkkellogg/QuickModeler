@@ -105,6 +105,7 @@ namespace Modeler {
 
     private:
 
+        void onMouseButtonEvent(MouseAdapter::MouseEvent event);
         void onGesture(GestureAdapter::GestureEvent event);
         void onEngineReady(Core::WeakPointer<Core::Engine> engine);
 

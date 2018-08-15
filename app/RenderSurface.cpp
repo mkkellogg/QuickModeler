@@ -37,6 +37,10 @@ namespace Modeler {
         return &gestureAdapter;
     }
 
+    MouseAdapter* RenderSurface::getMouseAdapter() {
+        return &mouseAdapter;
+    }
+
     void RenderSurface::handleWindowChanged(QQuickWindow *win) {
         if (win) {
             connect(win, &QQuickWindow::beforeSynchronizing, this, &RenderSurface::sync, Qt::DirectConnection);

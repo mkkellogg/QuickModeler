@@ -16,6 +16,8 @@ namespace Modeler {
         virtual ~ModelerAppWindow() = 0;
         virtual bool initialize(ModelerApp* modelerApp);
         virtual GestureAdapter* getGestureAdapter() = 0;
+        virtual MouseAdapter* getMouseAdapter()  = 0;
+
     protected:
         ModelerApp* modelerApp;
 

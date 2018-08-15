@@ -20,6 +20,18 @@ namespace Modeler {
         }
     }
 
+    void MouseAdapter::onMouseButtonPressed(ButtonEventCallback callback) {
+        this->buttonEventCallbacks[MouseEventType::ButtonPress].push_back(callback);
+    }
+
+    void MouseAdapter::onMouseButtonReleased(ButtonEventCallback callback) {
+        this->buttonEventCallbacks[MouseEventType::ButtonRelease].push_back(callback);
+    }
+
+    void MouseAdapter::onMouseButtonClicked(ButtonEventCallback callback) {
+        this->buttonEventCallbacks[MouseEventType::ButtonClick].push_back(callback);
+    }
+
     bool MouseAdapter::processEvent(QObject* obj, QEvent* event) {
 
         auto eventType = event->type();
@@ -29,25 +41,36 @@ namespace Modeler {
 
             const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>( event );
             unsigned int buttonIndex = getMouseButtonIndex(mouseEvent->button());
-            //std::cerr << buttonIndex << ", " << mouseEvent->button() << ", " << mouseEvent->buttons() << std::endl;
 
             QPoint qMousePos = mouseEvent->pos();
             Core::Vector2i mousePos(qMousePos.x(), qMousePos.y());
             MouseEventType mouseEventType;
             switch(eventType) {
                 case QEvent::MouseButtonPress:
+                {
                     buttonStatuses[buttonIndex].pressed = true;
                     buttonStatuses[buttonIndex].pressedLocation = mousePos;
                     pressedButtonMask |= 1 << (buttonIndex - 1);
-                    mouseEventType = MouseEventType::ButtonDown;
+                    mouseEventType = MouseEventType::ButtonPress;
+                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[MouseEventType::ButtonPress];
+                    for (ButtonEventCallback callback : pressCallbacks) {
+                        callback(MouseEventType::ButtonPress, mousePos.x, mousePos.y);
+                    }
                     break;
+                }
                 case QEvent::MouseButtonRelease:
+                {
                     buttonStatuses[buttonIndex].pressed = false;
                     pressedButtonMask &= ~(1 << (buttonIndex - 1));
-                    mouseEventType = MouseEventType::ButtonUp;
+                    mouseEventType = MouseEventType::ButtonRelease;
+                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[MouseEventType::ButtonRelease];
+                    for (ButtonEventCallback callback : pressCallbacks) {
+                        callback(MouseEventType::ButtonRelease, mousePos.x, mousePos.y);
+                    }
                     break;
+                }
                 case QEvent::MouseMove:
-                    mouseEventType = MouseEventType::MouseMoved;
+                    mouseEventType = MouseEventType::MouseMove;
                     break;
                 default: break;
             }
@@ -64,7 +87,7 @@ namespace Modeler {
 
              const QWheelEvent* const wheelEvent = static_cast<const QWheelEvent*>( event );
              if (this->pipedEventAdapter) {
-                 MouseEvent event(MouseEventType::WheelScrolled);
+                 MouseEvent event(MouseEventType::WheelScroll);
                  QPoint pDelta = wheelEvent->angleDelta();
 
                  event.scrollDelta = (Core::Real)wheelEvent->delta() / 240.0f;

@@ -38,6 +38,7 @@
 #include "Core/light/AmbientLight.h"
 #include "Core/light/DirectionalLight.h"
 #include "Core/scene/Transform.h"
+#include "Core/scene/TransformationSpace.h"
 
 
 using MeshContainer = Core::RenderableContainer<Core::Mesh>;
@@ -79,6 +80,9 @@ namespace Modeler {
                     this->coreSync = std::make_shared<CoreSync>(this->renderSurface);
                     this->onEngineReady(engine);
                     this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->coreSync);
+
+                    MouseAdapter* mouseAdapter = this->renderSurface->getMouseAdapter();
+                    mouseAdapter->onMouseButtonPressed(std::bind(&ModelerApp::onMouseButtonEvent, this, std::placeholders::_1));
                 };
                 renderSurface->getRenderer().onInit(initer);
             }
@@ -116,9 +120,19 @@ namespace Modeler {
                 Core::ModelLoader& modelLoader = engine->getModelLoader();
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
-                object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::Transform::TransformationSpace::World);
+                object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::TransformationSpace::World);
             };
             this->coreSync->run(runnable);
+        }
+    }
+
+    void ModelerApp::onMouseButtonEvent(MouseAdapter::MouseEvent event) {
+        switch(event.getType()) {
+            case MouseAdapter::MouseEventType::ButtonPress:
+            {
+
+                break;
+            }
         }
     }
 
@@ -336,7 +350,7 @@ namespace Modeler {
               bottomSlabObj->addRenderable(slab);
               sceneRoot->addChild(bottomSlabObj);
               bottomSlabObj->getTransform().getLocalMatrix().scale(15.0f, 1.0f, 15.0f);
-              bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -0.48f, 0.0f));
+              bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -1.0f, 0.0f));
 
 
               Core::WeakPointer<MeshContainer> rightSlabObj(engine->createObject3D<MeshContainer>());
@@ -378,21 +392,23 @@ namespace Modeler {
 
               Core::WeakPointer<Core::Object3D> pointLightObject = engine->createObject3D();
               this->sceneRoot->addChild(pointLightObject);
-              Core::WeakPointer<Core::PointLight> pointLight = engine->createPointLight<Core::PointLight>(pointLightObject, true, 2048, 0.0, 0.3);
+              Core::WeakPointer<Core::PointLight> pointLight = engine->createPointLight<Core::PointLight>(pointLightObject, true, 2048, 0.0115, 0.35);
               pointLight->setColor(1.0f, 1.0f, 1.0f, 1.0f);
+              pointLight->setShadowSoftness(Core::ShadowLight::Softness::VerySoft);
               pointLight->setRadius(10.0f);
 
               Core::WeakPointer<Core::Object3D> directionalLightObject = engine->createObject3D();
               this->sceneRoot->addChild(directionalLightObject);
-              Core::WeakPointer<Core::DirectionalLight> directionalLight = engine->createDirectionalLight<Core::DirectionalLight>(directionalLightObject, 3, true, 4096, 0.0003, 0.0);
+              Core::WeakPointer<Core::DirectionalLight> directionalLight = engine->createDirectionalLight<Core::DirectionalLight>(directionalLightObject, 3, true, 4096, 0.0001, 0.0005);
               directionalLight->setColor(1.0, 1.0, 1.0, 1.0f);
+             directionalLight->setShadowSoftness(Core::ShadowLight::Softness::VerySoft);
               directionalLightObject->getTransform().lookAt(Core::Point3r(1.0f, -1.0f, 1.0f));
 
               engine->onUpdate([this, pointLightObject]() {
 
                 static Core::Real rotationAngle = 0.0;
                 if (Core::WeakPointer<Core::Object3D>::isValid(pointLightObject)) {
-                  rotationAngle += 0.01;
+                 // rotationAngle += 0.01;
                   if (rotationAngle >= Core::Math::TwoPI) rotationAngle -= Core::Math::TwoPI;
 
                   Core::Quaternion qA;

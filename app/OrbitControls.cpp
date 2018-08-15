@@ -26,7 +26,7 @@ namespace Modeler {
                 cameraVec.set(0, 0, -1);
                 cameraObjPtr->getTransform().transform(cameraVec);
                 cameraVec = cameraVec * event.scrollDistance;
-                cameraObjPtr->getTransform().translate(cameraVec, Core::Transform::TransformationSpace::World);
+                cameraObjPtr->getTransform().translate(cameraVec, Core::TransformationSpace::World);
             };
             if (this->coreSync) {
                 this->coreSync->run(runnable);
@@ -110,7 +110,7 @@ namespace Modeler {
                     worldTransformation.preMultiply(rot);
                     orgVec.invert();
                     worldTransformation.preTranslate(orgVec);
-                    cameraObjPtr->getTransform().transformBy(worldTransformation, Core::Transform::TransformationSpace::World);
+                    cameraObjPtr->getTransform().transformBy(worldTransformation, Core::TransformationSpace::World);
                     cameraObjPtr->getTransform().lookAt(this->origin);
 
                 }
@@ -120,7 +120,7 @@ namespace Modeler {
                     viewDragVector.invert();
                     viewDragVector = viewDragVector * translationScaleFactor;
                     this->origin = this->origin + viewDragVector;
-                    cameraObjPtr->getTransform().translate(viewDragVector, Core::Transform::TransformationSpace::World);
+                    cameraObjPtr->getTransform().translate(viewDragVector, Core::TransformationSpace::World);
                 }
            };
            if (this->coreSync) {

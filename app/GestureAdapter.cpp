@@ -31,16 +31,16 @@ namespace Modeler {
 
         PointerState& pointerState = pointerStates[pointerIndex];
         switch(event.getType()){
-            case MouseAdapter::MouseEventType::ButtonDown:
+            case MouseAdapter::MouseEventType::ButtonPress:
                     pointerState.active = true;
                     pointerState.startPosition = event.position;
                     pointerState.position = event.position;
             break;
-            case MouseAdapter::MouseEventType::ButtonUp:
+            case MouseAdapter::MouseEventType::ButtonRelease:
                     pointerState.active = false;
                     pointerState.position = event.position;
             break;
-            case MouseAdapter::MouseEventType::MouseMoved:
+            case MouseAdapter::MouseEventType::MouseMove:
                 if (pointerState.active) {
                     GestureEvent gestureEvent(GestureEventType::Drag);
                     gestureEvent.start = pointerState.position;
@@ -52,7 +52,7 @@ namespace Modeler {
                     pointerState.position = event.position;
                 }
             break;
-            case MouseAdapter::MouseEventType::WheelScrolled:
+            case MouseAdapter::MouseEventType::WheelScroll:
                 GestureEvent gestureEvent(GestureEventType::Scroll);
                 gestureEvent.scrollDistance = event.scrollDelta;
                 if (this->pipedEventAdapter) {

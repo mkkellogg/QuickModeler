@@ -27,6 +27,7 @@ namespace Modeler  {
 
         virtual bool initialize(ModelerApp* modelerApp) override;
         virtual GestureAdapter* getGestureAdapter() override;
+        virtual MouseAdapter* getMouseAdapter() override;
 
     protected:
         bool eventFilter(QObject* obj, QEvent* event);
