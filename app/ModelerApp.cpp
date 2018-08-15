@@ -18,6 +18,8 @@
 #include "Core/color/IntColor.h"
 #include "Core/material/StandardAttributes.h"
 #include "Core/geometry/Mesh.h"
+#include "Core/geometry/Vector2.h"
+#include "Core/geometry/Vector3.h"
 #include "Core/render/RenderableContainer.h"
 #include "Core/render/MeshRenderer.h"
 #include "Core/render/RenderTarget.h"
@@ -82,7 +84,7 @@ namespace Modeler {
                     this->orbitControls = std::make_shared<OrbitControls>(this->engine, this->renderCamera, this->coreSync);
 
                     MouseAdapter* mouseAdapter = this->renderSurface->getMouseAdapter();
-                    mouseAdapter->onMouseButtonPressed(std::bind(&ModelerApp::onMouseButtonEvent, this, std::placeholders::_1));
+                    mouseAdapter->onMouseButtonPressed(std::bind(&ModelerApp::onMouseButtonAction, this, std::placeholders::_1,  std::placeholders::_2,  std::placeholders::_3, std::placeholders::_4));
                 };
                 renderSurface->getRenderer().onInit(initer);
             }
@@ -120,16 +122,68 @@ namespace Modeler {
                 Core::ModelLoader& modelLoader = engine->getModelLoader();
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
+
+                Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
+                        Core::WeakPointer<Core::Object3D>::dynamicPointerCast<Core::RenderableContainer<Core::Mesh>>(object);
+                if (meshContainer) {
+                    std::cerr << "adding model! " << std::endl;
+                    std::vector<Core::WeakPointer<Core::Mesh>> meshes= meshContainer->getRenderables();
+                    for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
+                         std::cerr << "adding model mesh! " << std::endl;
+                        this->rayCaster.addObject(object, mesh);
+                    }
+                }
                 object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::TransformationSpace::World);
             };
             this->coreSync->run(runnable);
         }
     }
 
-    void ModelerApp::onMouseButtonEvent(MouseAdapter::MouseEvent event) {
-        switch(event.getType()) {
+    void ModelerApp::onMouseButtonAction(MouseAdapter::MouseEventType type, Core::UInt32 button, Core::UInt32 x, Core::UInt32 y) {
+        switch(type) {
             case MouseAdapter::MouseEventType::ButtonPress:
             {
+                Core::Point3r pos((Core::Real)x, (Core::Real)y, (Core::Real)-1.0f);
+                if (button == 1) {
+                    CoreSync::Runnable runnable = [this, pos](Core::WeakPointer<Core::Engine> engine) {
+
+                        std::cerr << "pos: " << pos.x << ", " << pos.y << std::endl;
+                        Core::WeakPointer<Core::Graphics> graphics = this->engine->getGraphicsSystem();
+                        Core::WeakPointer<Core::Renderer> rendererPtr = graphics->getRenderer();
+                        Core::Vector4u viewport = graphics->getViewport();
+                                                std::cerr << "viewP: " << viewport.z << ", " << viewport.w << std::endl;
+                        Core::Real ndcX = (Core::Real)pos.x / (Core::Real)viewport.z * 2.0f - 1.0f;
+                        Core::Real ndcY = -((Core::Real)pos.y / (Core::Real)viewport.w * 2.0f - 1.0f);
+                        Core::Point3r ndcPos(ndcX, ndcY, -1.0);
+ std::cerr << "ndc: " << ndcPos.x << ", " << ndcPos.y << std::endl;
+                        this->renderCamera->unProject(ndcPos);
+                        std::cerr << "unprojected: " << ndcPos.x << ", " << ndcPos.y << ", " << ndcPos.z << std::endl;
+                        Core::Transform& camTransform = this->renderCamera->getOwner()->getTransform();
+                        camTransform.updateWorldMatrix();
+                        Core::Matrix4x4 camMat = camTransform.getWorldMatrix();
+                        Core::Matrix4x4 camMatInverse = camMat;
+                        camMatInverse.invert();
+
+                        Core::Point3r worldPos = ndcPos;
+                        camMat.transform(worldPos);
+                        Core::Point3r origin;
+                        camMat.transform(origin);
+                        Core::Vector3r rayDir = worldPos - origin;
+                        rayDir.normalize();
+                        std::cerr << ">>> origin: " << origin.x << ", " << origin.y << ", " << origin.z << std::endl;
+                        std::cerr << ">>> ray: " << rayDir.x << ", " << rayDir.y << ", " << rayDir.z << std::endl;
+                        Core::Ray ray(origin, rayDir);
+
+                        std::vector<Core::Hit> hits;
+                        Core::Bool hit = this->rayCaster.castRay(ray, hits);
+
+                        std::cerr << "Hit count: " << hits.size() << std::endl;
+
+                    };
+                    if (this->coreSync) {
+                        this->coreSync->run(runnable);
+                    }
+                }
 
                 break;
             }
@@ -333,6 +387,7 @@ namespace Modeler {
               slab->enableAttribute(Core::StandardAttribute::FaceNormal);
               Core::Bool faceNormalInited = slab->initVertexFaceNormals();
 
+              slab->calculateBoundingBox();
               slab->calculateNormals(75.0f);
 
 
@@ -349,6 +404,7 @@ namespace Modeler {
               Core::WeakPointer<Core::MeshRenderer> bottomSlabRenderer(engine->createRenderer<Core::MeshRenderer>(cubeMaterial, bottomSlabObj));
               bottomSlabObj->addRenderable(slab);
               sceneRoot->addChild(bottomSlabObj);
+              this->rayCaster.addObject(bottomSlabObj, slab);
               bottomSlabObj->getTransform().getLocalMatrix().scale(15.0f, 1.0f, 15.0f);
               bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -1.0f, 0.0f));
 

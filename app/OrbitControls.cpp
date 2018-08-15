@@ -47,13 +47,13 @@ namespace Modeler {
                 Core::WeakPointer<Core::Renderer> rendererPtr = graphics->getRenderer();
 
                 Core::Vector4u viewport = graphics->getViewport();
-                Core::Real ndcStartX = (Core::Real)eventStartX / viewport.z * 2.0f - 1.0f;
-                Core::Real ndcStartY = (Core::Real)eventStartY / viewport.w * 2.0f - 1.0f;
-                Core::Real ndcEndX = (Core::Real)eventEndX / viewport.z * 2.0f - 1.0f;
-                Core::Real ndcEndY = (Core::Real)eventEndY / viewport.w * 2.0f - 1.0f;
+                Core::Real ndcStartX = (Core::Real)eventStartX / (Core::Real)viewport.z * 2.0f - 1.0f;
+                Core::Real ndcStartY = (Core::Real)eventStartY / (Core::Real)viewport.w * 2.0f - 1.0f;
+                Core::Real ndcEndX = (Core::Real)eventEndX / (Core::Real)viewport.z * 2.0f - 1.0f;
+                Core::Real ndcEndY = (Core::Real)eventEndY / (Core::Real)viewport.w * 2.0f - 1.0f;
 
-                Core::Point3r viewStartP(ndcStartX, ndcEndY, 0.0f);
-                Core::Point3r viewEndP(ndcEndX, ndcStartY, 0.0f);
+                Core::Point3r viewStartP(ndcStartX, ndcEndY, 0.25f);
+                Core::Point3r viewEndP(ndcEndX, ndcStartY, 0.25f);
                 this->targetCamera->unProject(viewStartP);
                 this->targetCamera->unProject(viewEndP);
 
@@ -115,7 +115,7 @@ namespace Modeler {
 
                 }
                 else if (eventPointer == GesturePointer::Tertiary) {
-                    Core::Real translationScaleFactor = distanceFromOrigin * 0.5f;
+                    Core::Real translationScaleFactor = distanceFromOrigin;
                     Core::Vector3r viewDragVector = viewEnd - viewStart;
                     viewDragVector.invert();
                     viewDragVector = viewDragVector * translationScaleFactor;

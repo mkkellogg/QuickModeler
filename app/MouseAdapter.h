@@ -38,7 +38,7 @@ namespace Modeler {
             MouseEventType type;
         };
 
-        using ButtonEventCallback = std::function<void(MouseEventType, Core::UInt32, Core::UInt32)>;
+        using ButtonEventCallback = std::function<void(MouseEventType, Core::UInt32, Core::UInt32, Core::UInt32)>;
 
         MouseAdapter();
 
