@@ -21,15 +21,15 @@ namespace Modeler {
     }
 
     void MouseAdapter::onMouseButtonPressed(ButtonEventCallback callback) {
-        this->buttonEventCallbacks[MouseEventType::ButtonPress].push_back(callback);
+        this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonPress].push_back(callback);
     }
 
     void MouseAdapter::onMouseButtonReleased(ButtonEventCallback callback) {
-        this->buttonEventCallbacks[MouseEventType::ButtonRelease].push_back(callback);
+        this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonRelease].push_back(callback);
     }
 
     void MouseAdapter::onMouseButtonClicked(ButtonEventCallback callback) {
-        this->buttonEventCallbacks[MouseEventType::ButtonClick].push_back(callback);
+        this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonClick].push_back(callback);
     }
 
     bool MouseAdapter::processEvent(QObject* obj, QEvent* event) {
@@ -52,7 +52,7 @@ namespace Modeler {
                     buttonStatuses[buttonIndex].pressedLocation = mousePos;
                     pressedButtonMask |= 1 << (buttonIndex - 1);
                     mouseEventType = MouseEventType::ButtonPress;
-                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[MouseEventType::ButtonPress];
+                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonPress];
                     for (ButtonEventCallback callback : pressCallbacks) {
                         callback(MouseEventType::ButtonPress, mousePos.x, mousePos.y);
                     }
@@ -63,7 +63,7 @@ namespace Modeler {
                     buttonStatuses[buttonIndex].pressed = false;
                     pressedButtonMask &= ~(1 << (buttonIndex - 1));
                     mouseEventType = MouseEventType::ButtonRelease;
-                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[MouseEventType::ButtonRelease];
+                    std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonRelease];
                     for (ButtonEventCallback callback : pressCallbacks) {
                         callback(MouseEventType::ButtonRelease, mousePos.x, mousePos.y);
                     }

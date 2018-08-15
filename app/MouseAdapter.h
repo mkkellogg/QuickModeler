@@ -62,7 +62,7 @@ namespace Modeler {
         static unsigned int getMouseButtonIndex(const Qt::MouseButton& button);
 
         Core::WeakPointer<PipedEventAdapter<MouseEvent>> pipedEventAdapter;
-        std::unordered_map<MouseEventType, std::vector<ButtonEventCallback>> buttonEventCallbacks;
+        std::unordered_map<Core::UInt32, std::vector<ButtonEventCallback>> buttonEventCallbacks;
     };
 
 }
