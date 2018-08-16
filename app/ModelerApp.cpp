@@ -126,10 +126,8 @@ namespace Modeler {
                 Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
                         Core::WeakPointer<Core::Object3D>::dynamicPointerCast<Core::RenderableContainer<Core::Mesh>>(object);
                 if (meshContainer) {
-                    std::cerr << "adding model! " << std::endl;
                     std::vector<Core::WeakPointer<Core::Mesh>> meshes= meshContainer->getRenderables();
                     for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
-                         std::cerr << "adding model mesh! " << std::endl;
                         this->rayCaster.addObject(object, mesh);
                     }
                 }
@@ -147,17 +145,14 @@ namespace Modeler {
                 if (button == 1) {
                     CoreSync::Runnable runnable = [this, pos](Core::WeakPointer<Core::Engine> engine) {
 
-                        std::cerr << "pos: " << pos.x << ", " << pos.y << std::endl;
                         Core::WeakPointer<Core::Graphics> graphics = this->engine->getGraphicsSystem();
                         Core::WeakPointer<Core::Renderer> rendererPtr = graphics->getRenderer();
                         Core::Vector4u viewport = graphics->getViewport();
-                                                std::cerr << "viewP: " << viewport.z << ", " << viewport.w << std::endl;
+
                         Core::Real ndcX = (Core::Real)pos.x / (Core::Real)viewport.z * 2.0f - 1.0f;
                         Core::Real ndcY = -((Core::Real)pos.y / (Core::Real)viewport.w * 2.0f - 1.0f);
                         Core::Point3r ndcPos(ndcX, ndcY, -1.0);
- std::cerr << "ndc: " << ndcPos.x << ", " << ndcPos.y << std::endl;
                         this->renderCamera->unProject(ndcPos);
-                        std::cerr << "unprojected: " << ndcPos.x << ", " << ndcPos.y << ", " << ndcPos.z << std::endl;
                         Core::Transform& camTransform = this->renderCamera->getOwner()->getTransform();
                         camTransform.updateWorldMatrix();
                         Core::Matrix4x4 camMat = camTransform.getWorldMatrix();
@@ -170,8 +165,6 @@ namespace Modeler {
                         camMat.transform(origin);
                         Core::Vector3r rayDir = worldPos - origin;
                         rayDir.normalize();
-                        std::cerr << ">>> origin: " << origin.x << ", " << origin.y << ", " << origin.z << std::endl;
-                        std::cerr << ">>> ray: " << rayDir.x << ", " << rayDir.y << ", " << rayDir.z << std::endl;
                         Core::Ray ray(origin, rayDir);
 
                         std::vector<Core::Hit> hits;
@@ -487,7 +480,6 @@ namespace Modeler {
                   lightObjectPtr->getTransform().getLocalMatrix().copy(worldMatrix);
 
                   auto vp = Core::Engine::instance()->getGraphicsSystem()->getCurrentRenderTarget()->getViewport();
-                 // std::cerr << vp.z << ", " << vp.w << std::endl;
                   this->renderCamera->setAspectRatioFromDimensions(vp.z, vp.w);
                 }
               }, true);
