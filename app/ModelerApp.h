@@ -17,6 +17,7 @@
 #include "Core/Engine.h"
 #include "Core/material/BasicTexturedMaterial.h"
 #include "Core/material/Shader.h"
+#include "Core/scene/RayCaster.h"
 
 static const char gridMaterial_vertex[] =
     "#version 100\n"
@@ -105,7 +106,7 @@ namespace Modeler {
 
     private:
 
-        void onMouseButtonEvent(MouseAdapter::MouseEvent event);
+        void onMouseButtonAction(MouseAdapter::MouseEventType type, Core::UInt32 button, Core::UInt32 x, Core::UInt32 y);
         void onGesture(GestureAdapter::GestureEvent event);
         void onEngineReady(Core::WeakPointer<Core::Engine> engine);
 
@@ -117,6 +118,7 @@ namespace Modeler {
         Core::WeakPointer<Core::Engine> engine;
         std::shared_ptr<PipedEventAdapter<GestureAdapter::GestureEvent>> pipedGestureAdapter;
         Core::WeakPointer<Core::Object3D> sceneRoot;
+        Core::RayCaster rayCaster;
         RenderSurface* renderSurface;
         std::shared_ptr<CoreSync> coreSync;
 

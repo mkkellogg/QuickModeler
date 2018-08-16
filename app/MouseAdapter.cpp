@@ -54,7 +54,7 @@ namespace Modeler {
                     mouseEventType = MouseEventType::ButtonPress;
                     std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonPress];
                     for (ButtonEventCallback callback : pressCallbacks) {
-                        callback(MouseEventType::ButtonPress, mousePos.x, mousePos.y);
+                        callback(MouseEventType::ButtonPress, buttonIndex, mousePos.x, mousePos.y);
                     }
                     break;
                 }
@@ -65,7 +65,7 @@ namespace Modeler {
                     mouseEventType = MouseEventType::ButtonRelease;
                     std::vector<ButtonEventCallback> pressCallbacks = this->buttonEventCallbacks[(Core::UInt32)MouseEventType::ButtonRelease];
                     for (ButtonEventCallback callback : pressCallbacks) {
-                        callback(MouseEventType::ButtonRelease, mousePos.x, mousePos.y);
+                        callback(MouseEventType::ButtonRelease, buttonIndex, mousePos.x, mousePos.y);
                     }
                     break;
                 }
