@@ -123,14 +123,19 @@ namespace Modeler {
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
 
-                Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
-                        Core::WeakPointer<Core::Object3D>::dynamicPointerCast<Core::RenderableContainer<Core::Mesh>>(object);
-                if (meshContainer) {
-                    std::vector<Core::WeakPointer<Core::Mesh>> meshes= meshContainer->getRenderables();
-                    for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
-                        this->rayCaster.addObject(object, mesh);
+
+                Core::WeakPointer<Core::Scene> scene = engine->getActiveScene();
+                scene->visitScene(object, [this](Core::WeakPointer<Core::Object3D> obj){
+                    Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
+                            Core::WeakPointer<Core::Object3D>::dynamicPointerCast<Core::RenderableContainer<Core::Mesh>>(obj);
+                    if (meshContainer) {
+                        std::vector<Core::WeakPointer<Core::Mesh>> meshes = meshContainer->getRenderables();
+                        for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
+                            this->rayCaster.addObject(obj, mesh);
+                        }
                     }
-                }
+                });
+
                 object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::TransformationSpace::World);
             };
             this->coreSync->run(runnable);
@@ -400,6 +405,7 @@ namespace Modeler {
               this->rayCaster.addObject(bottomSlabObj, slab);
               bottomSlabObj->getTransform().getLocalMatrix().scale(15.0f, 1.0f, 15.0f);
               bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -1.0f, 0.0f));
+              bottomSlabObj->getTransform().getLocalMatrix().preRotate(0.0f, 1.0f, 0.0f,Core::Math::PI / 4.0f);
 
 
               Core::WeakPointer<MeshContainer> rightSlabObj(engine->createObject3D<MeshContainer>());
