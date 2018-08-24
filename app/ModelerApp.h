@@ -123,7 +123,7 @@ namespace Modeler {
         std::shared_ptr<CoreSync> coreSync;
 
     public slots:
-        void loadModel(const QString& path);
+        void loadModel(const QString& path, const QString& scaleText, const QString& smoothingThresholdText, const bool zUp);
     };
 }
 

@@ -33,7 +33,7 @@ Item {
         border.color: "black"
         x: 0
         y: 0
-        height: 60
+        height: 38
         width: parent.width
         property alias modelPathText: modelNameText.text
 
@@ -56,7 +56,7 @@ Item {
 
             Rectangle{
                height: navigation.height
-               width: 30
+               width: 15
             }
 
             Label {
@@ -64,30 +64,46 @@ Item {
             }
 
             TextField {
-                Layout.preferredWidth: 50
+                Layout.preferredWidth: 40
                 id: modelScaleText
                 text: "1.0"
             }
 
             Rectangle{
                height: navigation.height
-               width: 30
+               width: 15
+            }
+
+            Label {
+                text: "Smoothing limit: "
+            }
+
+            TextField {
+                Layout.preferredWidth: 40
+                id: modelSmoothingThresholdText
+                text: "80"
+            }
+
+            Rectangle{
+               height: navigation.height
+               width: 15
             }
 
             CheckBox {
+               id: zUpCheckbox
                text: qsTr("Z-up")
                checked: true
             }
 
             Rectangle{
                height: navigation.height
-               width: 30
+               width: 15
             }
 
             Button {
                 text: "Load"
                 onClicked: {
-                    _modelerApp.loadModel(modelNameText.text);
+                    _modelerApp.loadModel(modelNameText.text, modelScaleText.text, modelSmoothingThresholdText.text, zUpCheckbox.checked);
                 }
             }
         }
