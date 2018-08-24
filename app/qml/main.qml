@@ -1,8 +1,8 @@
 import QtQuick 2.0
 import RenderSurface 1.0
-import QtQuick.Layouts 1.3
-import QtQuick.Controls 2.3
-import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.2
+import QtQuick.Controls 1.2
+import QtQuick.Dialogs 1.2
 
 Item {
 
@@ -43,7 +43,7 @@ Item {
             TextField {
                 Layout.preferredWidth: 400
                 id: modelNameText
-                text: "file:///home/mark/Development/Qt/resources/models/toon-level/mushroom/MushRoom_01.fbx"
+                text: "file:///home/mark/Development/GTE/resources/models/toonlevel/mushroom/MushRoom_01.fbx"
                 placeholderText: qsTr("Enter filename...")
             }
 
@@ -52,6 +52,36 @@ Item {
                 onClicked: {
                     modelChooserDialog.visible = true
                 }
+            }
+
+            Rectangle{
+               height: navigation.height
+               width: 30
+            }
+
+            Label {
+                text: "Scale: "
+            }
+
+            TextField {
+                Layout.preferredWidth: 50
+                id: modelScaleText
+                text: "1.0"
+            }
+
+            Rectangle{
+               height: navigation.height
+               width: 30
+            }
+
+            CheckBox {
+               text: qsTr("Z-up")
+               checked: true
+            }
+
+            Rectangle{
+               height: navigation.height
+               width: 30
             }
 
             Button {
