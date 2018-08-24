@@ -123,7 +123,6 @@ namespace Modeler {
                 Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, .05f, false, false, true);
                 this->sceneRoot->addChild(object);
 
-
                 Core::WeakPointer<Core::Scene> scene = engine->getActiveScene();
                 scene->visitScene(object, [this](Core::WeakPointer<Core::Object3D> obj){
                     Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
@@ -136,7 +135,7 @@ namespace Modeler {
                     }
                 });
 
-                object->getTransform().translate(0.0f, 0.0f, 0.0f, Core::TransformationSpace::World);
+                object->getTransform().rotate(1.0f, 0.0f, 0.0f, -Core::Math::PI / 2.0);
             };
             this->coreSync->run(runnable);
         }
@@ -207,6 +206,8 @@ namespace Modeler {
         engine->setActiveScene(scene);
         this->sceneRoot = scene->getRoot();
 
+
+
         // ====== initial camera setup ====================
         Core::WeakPointer<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
         this->renderCamera = engine->createPerspectiveCamera(cameraObj, Core::Camera::DEFAULT_FOV, Core::Camera::DEFAULT_ASPECT_RATIO, 0.1f, 100);
@@ -225,72 +226,6 @@ namespace Modeler {
         cameraObj->getTransform().getLocalMatrix().copy(worldMatrix);
         cameraObj->getTransform().updateWorldMatrix();
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
-
-
-        Core::UInt32 gridMeshSubdivisions = 10;
-        Core::Real gridSize = 15.0f;
-        Core::Real texToWorld = 5.0f;
-        Core::Real gridCellWorldSize = 1.0f;
-        Core::WeakPointer<Core::Mesh> gridPlane = Core::GeometryUtils::createGrid(gridSize, gridSize, gridMeshSubdivisions, gridMeshSubdivisions, texToWorld, texToWorld);
-
-        Core::WeakPointer<MeshContainer> gridPlaneObj(engine->createObject3D<MeshContainer>());
-
-        Core::TextureAttributes texAttributes;
-        texAttributes.FilterMode = Core::TextureFilter::TriLinear;
-        texAttributes.MipMapLevel = 4;
-        texAttributes.WrapMode = Core::TextureWrap::Repeat;
-        Core::WeakPointer<Core::Texture2D> texture = engine->getGraphicsSystem()->createTexture2D(texAttributes);
-
-        Core::UInt32 gridTextureSize = 1024;
-        std::shared_ptr<Core::RawImage> rawImage = std::make_shared<Core::RawImage>(gridTextureSize, gridTextureSize);
-        rawImage->init();
-
-        Core::ImagePainter texturePainter(rawImage);
-        texturePainter.setDrawColor(Core::IntColor(255, 255, 255, 255));
-
-
-        Core::Real gridCellTextureSize = gridCellWorldSize / texToWorld;
-        Core::UInt32 gridLineWidth = 4;
-        Core::UInt32 gridLineHalfWidth = gridLineWidth / 2;
-        Core::UInt32 cellSize = (Core::UInt32)(gridCellTextureSize * (Core::Real)gridTextureSize);
-        Core::UInt32 halfCellSize = cellSize / 2;
-
-        for (Core::UInt32 x = halfCellSize; x < gridTextureSize; x += cellSize) {
-            Core::UInt32 upper = x + gridLineHalfWidth - 1;
-            if (gridLineHalfWidth == 0) upper = x + 1;
-            for (Core::UInt32 w = x - gridLineHalfWidth; w < upper; w++) {
-                texturePainter.drawVerticalLine(w, 0, gridTextureSize);
-                texturePainter.drawHorizontalLine(0, w, gridTextureSize);
-            }
-        }
-
-        texture->build(rawImage);
-
-        Core::WeakPointer<GridMaterial> gridPlaneMaterial = engine->createMaterial<GridMaterial>();
-        gridPlaneMaterial->setTexture(texture);
-        gridPlaneMaterial->setBounds(Core::Vector4r(-7.011, -7.011, -6.986, -6.986));
-
-        Core::WeakPointer<Core::MeshRenderer> gridPlaneRenderer(engine->createRenderer<Core::MeshRenderer>(gridPlaneMaterial, gridPlaneObj));
-        gridPlaneObj->addRenderable(gridPlane);
-      //  this->sceneRoot->addChild(gridPlaneObj);
-        gridPlaneObj->getTransform().rotate(1, 0, 0, -Core::Math::PI / 2.0f);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
