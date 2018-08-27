@@ -66,7 +66,7 @@ Item {
             TextField {
                 Layout.preferredWidth: 40
                 id: modelScaleText
-                text: "1.0"
+                text: "0.05"
             }
 
             Rectangle{

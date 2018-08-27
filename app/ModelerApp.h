@@ -16,6 +16,7 @@
 
 #include "Core/Engine.h"
 #include "Core/material/BasicTexturedMaterial.h"
+#include "Core/material/BasicColoredMaterial.h"
 #include "Core/material/Shader.h"
 #include "Core/scene/RayCaster.h"
 
@@ -121,6 +122,9 @@ namespace Modeler {
         Core::RayCaster rayCaster;
         RenderSurface* renderSurface;
         std::shared_ptr<CoreSync> coreSync;
+        std::unordered_map<Core::UInt64, Core::WeakPointer<Core::Object3D>> meshToObjectMap;
+        Core::WeakPointer<Core::Object3D> selectedObject;
+        Core::WeakPointer<Core::BasicColoredMaterial> highlightMaterial;
 
     public slots:
         void loadModel(const QString& path, const QString& scaleText, const QString& smoothingThresholdText, const bool zUp);

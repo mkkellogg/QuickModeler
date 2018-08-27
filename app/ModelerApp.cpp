@@ -141,23 +141,24 @@ namespace Modeler {
 
             CoreSync::Runnable runnable = [this, sPath, scale, smoothingThreshold, zUp](Core::WeakPointer<Core::Engine> engine) {
                 Core::ModelLoader& modelLoader = engine->getModelLoader();
-                Core::WeakPointer<Core::Object3D> object = modelLoader.loadModel(sPath, scale, smoothingThreshold, false, false, true);
-                this->sceneRoot->addChild(object);
+                Core::WeakPointer<Core::Object3D> rootObject = modelLoader.loadModel(sPath, scale, smoothingThreshold, false, false, true);
+                this->sceneRoot->addChild(rootObject);
 
                 Core::WeakPointer<Core::Scene> scene = engine->getActiveScene();
-                scene->visitScene(object, [this](Core::WeakPointer<Core::Object3D> obj){
+                scene->visitScene(rootObject, [this, &rootObject](Core::WeakPointer<Core::Object3D> obj){
                     Core::WeakPointer<Core::RenderableContainer<Core::Mesh>> meshContainer =
                             Core::WeakPointer<Core::Object3D>::dynamicPointerCast<Core::RenderableContainer<Core::Mesh>>(obj);
                     if (meshContainer) {
                         std::vector<Core::WeakPointer<Core::Mesh>> meshes = meshContainer->getRenderables();
                         for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
                             this->rayCaster.addObject(obj, mesh);
+                            this->meshToObjectMap[mesh->getObjectID()] = rootObject;
                         }
                     }
                 });
 
                 if (zUp) {
-                    object->getTransform().rotate(1.0f, 0.0f, 0.0f, -Core::Math::PI / 2.0);
+                    rootObject->getTransform().rotate(1.0f, 0.0f, 0.0f, -Core::Math::PI / 2.0);
                 }
             };
             this->coreSync->run(runnable);
@@ -198,6 +199,15 @@ namespace Modeler {
                         Core::Bool hit = this->rayCaster.castRay(ray, hits);
 
                         std::cerr << "Hit count: " << hits.size() << std::endl;
+                        if (hits.size() > 0) {
+                            Core::Hit& hit = hits[0];
+                            Core::WeakPointer<Core::Mesh> hitObject = hit.Object;
+                            Core::WeakPointer<Core::Object3D> rootObject =this->meshToObjectMap[hitObject->getObjectID()];
+                            this->selectedObject = rootObject;
+                            if (this->selectedObject) {
+                                 std::cerr << "Selected: " << this->selectedObject->getObjectID() << std::endl;
+                            }
+                        }
 
                     };
                     if (this->coreSync) {
@@ -229,7 +239,6 @@ namespace Modeler {
         engine->setActiveScene(scene);
         this->sceneRoot = scene->getRoot();
 
-
         // ====== initial camera setup ====================
         Core::WeakPointer<Core::Object3D> cameraObj = engine->createObject3D<Core::Object3D>();
         this->renderCamera = engine->createPerspectiveCamera(cameraObj, Core::Camera::DEFAULT_FOV, Core::Camera::DEFAULT_ASPECT_RATIO, 0.1f, 100);
@@ -250,7 +259,7 @@ namespace Modeler {
         cameraObj->getTransform().lookAt(Core::Point3r(0, 0, 0));
 
 
-        // ====== model platform setup ====================
+        // ====== model platform vertex attributes ====================
         Core::Real cubeVertexPositions[] = {
             // back
             -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0,
@@ -293,31 +302,31 @@ namespace Modeler {
             0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,  0.0, 0.0, 1.0, 0.0,
         };
 
-        Core::Color slabColor(0.5f, 0.5f, 0.5f, 1.0f);
-
+        Core::Color slabColor(0.0f, 0.53f, 0.16f, 1.0f);
         Core::Real cubeVertexColors[] = {
             // back
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
             // left
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
             // right
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
             // top
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
             // bottom
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
             // front
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-            0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0,
+            slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0, slabColor.r, slabColor.g, slabColor.b, 1.0
         };
 
         Core::WeakPointer<Core::BasicLitMaterial> cubeMaterial(engine->createMaterial<Core::BasicLitMaterial>());
         cubeMaterial->build();
+
 
         // ======= model platform objects ===============
         Core::WeakPointer<Core::Mesh> slab(engine->createMesh(36, false));
@@ -348,6 +357,8 @@ namespace Modeler {
         bottomSlabObj->addRenderable(slab);
         sceneRoot->addChild(bottomSlabObj);
         this->rayCaster.addObject(bottomSlabObj, slab);
+        this->meshToObjectMap[slab->getObjectID()] = bottomSlabObj;
+        // this->meshToObjectMap[slab->getObjectID()] = Core::WeakPointer<MeshContainer>::dynamicPointerCast<Core::Object3D>( bottomSlabObj);
         bottomSlabObj->getTransform().getLocalMatrix().scale(15.0f, 1.0f, 15.0f);
         bottomSlabObj->getTransform().getLocalMatrix().preTranslate(Core::Vector3r(0.0f, -1.0f, 0.0f));
         bottomSlabObj->getTransform().getLocalMatrix().preRotate(0.0f, 1.0f, 0.0f,Core::Math::PI / 4.0f);
@@ -401,6 +412,36 @@ namespace Modeler {
 
                 auto vp = Core::Engine::instance()->getGraphicsSystem()->getCurrentRenderTarget()->getViewport();
                 this->renderCamera->setAspectRatioFromDimensions(vp.z, vp.w);
+
+            }
+        }, true);
+
+
+
+        this->highlightMaterial = engine->createMaterial<Core::BasicColoredMaterial>();
+        this->highlightMaterial->setBlendingEnabled(true);
+        this->highlightMaterial->setSourceBlendingMethod(Core::RenderState::BlendingMethod::SrcAlpha);
+        this->highlightMaterial->setDestBlendingMethod(Core::RenderState::BlendingMethod::OneMinusSrcAlpha);
+        engine->onRender([this]() {
+             Core::Color highlightColor(1.0, 0.65, 0.0, 0.5);
+             Core::Color highlightLineColor(1.0, 0.65, 0.0, 1.0);
+             if (this->selectedObject) {
+                  //  std::cerr << "rendering..." << this->selectedObject->getObjectID() << std::endl;
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Color, false);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, false);
+
+                    this->highlightMaterial->setZOffset(-.00005f);
+                    this->highlightMaterial->setColor(highlightColor);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
+                    this->highlightMaterial->setRenderStyle(Core::RenderStyle::Line);
+                    this->highlightMaterial->setZOffset(-.0001f);
+                    this->highlightMaterial->setColor(highlightLineColor);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
+                    this->highlightMaterial->setRenderStyle(Core::RenderStyle::Fill);
+                    this->highlightMaterial->setColor(highlightColor);
+
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Color, true);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, true);
             }
         }, true);
     }
