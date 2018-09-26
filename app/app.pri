@@ -39,3 +39,6 @@ SOURCES += \
 RESOURCES += \
     $$PWD/qml/qml.qrc
 
+DISTFILES += \
+    $$PWD/qml/images/arrow.png
+

@@ -55,17 +55,16 @@ TreeModel::TreeModel(QObject *parent)
     : QStandardItemModel(parent)
 {
     m_roleNameMapping[MyTreeModel_Role_Name] = "name_role";
-    m_roleNameMapping[MyTreeModel_Role_Description] = "description_role";
 
-    addEntry( "Option A", "Recommended", "This is Option A" );
-   addEntry( "Option B", "Recommended", "This is Option B" );
-   addEntry( "Option C", "Recommended", "This is Option C" );
-   addEntry( "Option D", "Recommended", "This is Option D" );
+    addEntry( "Option A", "Recommended");
+   addEntry( "Option B", "Recommended");
+   addEntry( "Option C", "Recommended");
+   addEntry( "Option D", "Recommended");
 
-   addEntry( "Option E", "Optional", "This is Option E" );
-   addEntry( "Option F", "Optional", "This is Option F" );
-   addEntry( "Option G", "Optional", "This is Option G" );
-   addEntry( "Option H", "Optional", "This is Option H" );
+   addEntry( "Option E", "Optional");
+   addEntry( "Option F", "Optional");
+   addEntry( "Option G", "Optional");
+   addEntry( "Option H", "Optional" );
 }
 
 
@@ -74,13 +73,12 @@ TreeModel::~TreeModel()
    // delete rootItem;
 }
 
-void TreeModel::addEntry( const QString& name, const QString& type, const QString& description )
+void TreeModel::addEntry( const QString& name, const QString& type)
 {
-    auto childEntry = new QStandardItem( name );
-    childEntry->setData( description, MyTreeModel_Role_Description );
+    auto childEntry = new QStandardItem(name);
 
-    QStandardItem* entry = getBranch( type );
-    entry->appendRow( childEntry );
+    QStandardItem* entry = getBranch(type);
+    entry->appendRow(childEntry);
 }
 
 QStandardItem *TreeModel::getBranch(const QString &branchName)

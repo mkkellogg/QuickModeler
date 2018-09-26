@@ -55,7 +55,6 @@ public:
     enum MyTreeModel_Roles
     {
         MyTreeModel_Role_Name = Qt::DisplayRole,
-        MyTreeModel_Role_Description = Qt::WhatsThisRole
     };
 
     explicit TreeModel(QObject *parent = 0);
@@ -82,7 +81,7 @@ private:
     //void setupModelData(const QStringList &lines, TreeItem *parent);
 
     //TreeItem *rootItem;
-    void addEntry( const QString& name, const QString& type, const QString& description );
+    void addEntry( const QString& name, const QString& type);
     QStandardItem* getBranch( const QString& branchName );
     QHash<int, QByteArray> m_roleNameMapping;
 };

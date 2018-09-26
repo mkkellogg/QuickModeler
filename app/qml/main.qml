@@ -2,6 +2,7 @@ import QtQuick 2.0
 import RenderSurface 1.0
 import QtQuick.Layouts 1.2
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 
 
@@ -124,12 +125,39 @@ Item {
         TreeView {
             anchors.fill: parent
             model: theModel
-            //itemDelegate: TreeDelegate {}
-            itemDelegate: Rectangle {
-                color: ( styleData.row % 2 == 0 ) ? "white" : "white"
-                height: 20
+            alternatingRowColors: false
+            style: TreeViewStyle {
+                alternateBackgroundColor: 'white'
+                backgroundColor: 'white'
+                branchDelegate: Rectangle {
+                   width: 15; height: 15
+                   color: "#00FFFF00"
+                   Image {
+                       visible: styleData.column === 0 && styleData.hasChildren
+                       anchors.fill: parent
+                       anchors.verticalCenterOffset: 2
+                       source: "images/arrow.png"
+                       transform: Rotation {
+                           origin.x: width / 2
+                           origin.y: height / 2
+                           angle: styleData.isExpanded ? 0 : -90
+                       }
+                   }
 
+               }
+            }
+
+
+            rowDelegate: Rectangle {
+                color: ( styleData.selected ) ? "#FF99CCFF" : "white"
+            }
+
+
+            itemDelegate: Rectangle {
+                color: ( styleData.selected ) ? "#FF99CCFF" : "white"
+                height: 20
                 Text {
+                    color: ( styleData.selected ) ? "black" : "black"
                     anchors.verticalCenter: parent.verticalCenter
                     text: styleData.value === undefined ? "" : styleData.value // The branches don't have a description_role so styleData.value will be undefined
                 }
@@ -138,10 +166,6 @@ Item {
              TableViewColumn {
                 role: "name_role"
                 title: "Name"
-             }
-             TableViewColumn {
-                role: "description_role"
-                title: "Description"
              }
         }
     }
