@@ -17,7 +17,9 @@ HEADERS += \
     $$PWD/OrbitControls.h \
     $$PWD/Settings.h \
     $$PWD/Exception.h \
-    $$PWD/CoreSync.h
+    $$PWD/CoreSync.h \
+    $$PWD/TreeModel.h \
+    $$PWD/TreeItem.h
 
 SOURCES += \
     $$PWD/RenderSurface.cpp \
@@ -30,7 +32,9 @@ SOURCES += \
     $$PWD/Event.cpp \
     $$PWD/OrbitControls.cpp \
     $$PWD/Settings.cpp \
-    $$PWD/CoreSync.cpp
+    $$PWD/CoreSync.cpp \
+    $$PWD/TreeModel.cpp \
+    $$PWD/TreeItem.cpp
 
 RESOURCES += \
     $$PWD/qml/qml.qrc

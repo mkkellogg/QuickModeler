@@ -152,7 +152,7 @@ namespace Modeler {
                         std::vector<Core::WeakPointer<Core::Mesh>> meshes = meshContainer->getRenderables();
                         for (Core::WeakPointer<Core::Mesh> mesh : meshes) {
                             this->rayCaster.addObject(obj, mesh);
-                            this->meshToObjectMap[mesh->getObjectID()] = rootObject;
+                            this->meshToObjectMap[mesh->getObjectID()] = obj;
                         }
                     }
                 });
@@ -198,14 +198,14 @@ namespace Modeler {
                         std::vector<Core::Hit> hits;
                         Core::Bool hit = this->rayCaster.castRay(ray, hits);
 
-                        std::cerr << "Hit count: " << hits.size() << std::endl;
+                       // std::cerr << "Hit count: " << hits.size() << std::endl;
                         if (hits.size() > 0) {
                             Core::Hit& hit = hits[0];
                             Core::WeakPointer<Core::Mesh> hitObject = hit.Object;
                             Core::WeakPointer<Core::Object3D> rootObject =this->meshToObjectMap[hitObject->getObjectID()];
                             this->selectedObject = rootObject;
                             if (this->selectedObject) {
-                                 std::cerr << "Selected: " << this->selectedObject->getObjectID() << std::endl;
+                                // std::cerr << "Selected: " << this->selectedObject->getObjectID() << std::endl;
                             }
                         }
 
@@ -419,29 +419,30 @@ namespace Modeler {
 
 
         this->highlightMaterial = engine->createMaterial<Core::BasicColoredMaterial>();
-        this->highlightMaterial->setBlendingEnabled(true);
+        this->highlightMaterial->setBlendingMode(Core::RenderState::BlendingMode::Custom);
         this->highlightMaterial->setSourceBlendingMethod(Core::RenderState::BlendingMethod::SrcAlpha);
         this->highlightMaterial->setDestBlendingMethod(Core::RenderState::BlendingMethod::OneMinusSrcAlpha);
+        this->highlightMaterial->setLit(false);
         engine->onRender([this]() {
              Core::Color highlightColor(1.0, 0.65, 0.0, 0.5);
              Core::Color highlightLineColor(1.0, 0.65, 0.0, 1.0);
              if (this->selectedObject) {
                   //  std::cerr << "rendering..." << this->selectedObject->getObjectID() << std::endl;
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Color, false);
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, false);
+                    this->renderCamera->setAutoClearRenderBuffer(Core::RenderBufferType::Color, false);
+                    this->renderCamera->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, false);
 
                     this->highlightMaterial->setZOffset(-.00005f);
                     this->highlightMaterial->setColor(highlightColor);
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderObjectBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
                     this->highlightMaterial->setRenderStyle(Core::RenderStyle::Line);
                     this->highlightMaterial->setZOffset(-.0001f);
                     this->highlightMaterial->setColor(highlightLineColor);
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
+                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->renderObjectBasic(this->selectedObject, this->renderCamera, this->highlightMaterial);
                     this->highlightMaterial->setRenderStyle(Core::RenderStyle::Fill);
                     this->highlightMaterial->setColor(highlightColor);
 
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Color, true);
-                    Core::Engine::instance()->getGraphicsSystem()->getRenderer()->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, true);
+                    this->renderCamera->setAutoClearRenderBuffer(Core::RenderBufferType::Color, true);
+                    this->renderCamera->setAutoClearRenderBuffer(Core::RenderBufferType::Depth, true);
             }
         }, true);
     }

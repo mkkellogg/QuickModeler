@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import RenderSurface 1.0
 import QtQuick.Layouts 1.2
-import QtQuick.Controls 1.2
+import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
+
 
 Item {
 
@@ -119,6 +120,30 @@ Item {
         anchors.top: topMenu.bottom
         height: parent.height - topMenu.height
         width:250
+
+        TreeView {
+            anchors.fill: parent
+            model: theModel
+            //itemDelegate: TreeDelegate {}
+            itemDelegate: Rectangle {
+                color: ( styleData.row % 2 == 0 ) ? "white" : "white"
+                height: 20
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: styleData.value === undefined ? "" : styleData.value // The branches don't have a description_role so styleData.value will be undefined
+                }
+             }
+
+             TableViewColumn {
+                role: "name_role"
+                title: "Name"
+             }
+             TableViewColumn {
+                role: "description_role"
+                title: "Description"
+             }
+        }
     }
 
     RenderSurface {
